@@ -15,7 +15,7 @@
                 <a href="/login">Google</a>
             </v-container>
             <v-container v-if="profile">
-                <messages-list :messages="messages"/>
+                <messages-list />
             </v-container>
         </v-main>
 
@@ -25,31 +25,41 @@
 </template>
 
 <script>
+    import { mapState, mapMutations } from 'vuex'
     import MessagesList from 'components/messages/MessageList.vue'
     import { addHandler } from 'util/ws'
-    import { getIndex } from 'util/collections'
 
     export default {
         components:{
             MessagesList
         },
-
-        data() {
-            return {
-                messages: frontendData.messages,
-                profile: frontendData.profile
-            }
-        },
+        computed: mapState(['profile']),
+        methods: mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation']),
 
         created() {
             addHandler(data => {
-                let index = getIndex(this.messages, data.id);
-
-                if (index > -1){
-                    this.messages.splice(index, 1, data)
-                }else{
-                    this.messages.push(data)
+                if (data.objectType === 'MESSAGE'){
+                    switch (data.eventType) {
+                        case 'CREATE' :
+                            console.log('CREATE in APP');
+                            this.addMessageMutation(data.body);
+                            break;
+                        case 'UPDATE' :
+                            console.log('UPDATE in APP');
+                            this.updateMessageMutation(data.body);
+                            break;
+                        case 'REMOVE' :
+                            console.log('REMOVE in APP');
+                            this.removeMessageMutation(data.body);
+                            break;
+                        default:
+                            console.error('Looks like event type is unknown "${data.eventType}" ')
+                    }
+                } else {
+                    console.error('Looks like the object type is unknown "${data.bodyType}" ')
                 }
+
+
             })
         }
 

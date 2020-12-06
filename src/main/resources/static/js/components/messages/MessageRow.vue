@@ -5,7 +5,7 @@
             <i>({{ message.id }})</i>{{ message.text }}
             <i style="font-size: x-small">
                 {{new Date(message.creationDate).getHours()}}:{{new Date(message.creationDate).getMinutes()}}
-                <!--                {{message.creationDate}}-->
+<!--                                {{message.creationDate}}-->
             </i>
         </v-chip>
 
@@ -23,16 +23,19 @@
 </template>
 
 <script>
+    import { mapActions } from 'vuex'
     export default {
-        props: ['message', 'editMessage', 'deleteMessage', 'messages'],
+        props: ['message', 'editMessage'],
 
         methods: {
+            ...mapActions(['removeMessageActions']),
             edit() {
                 this.editMessage(this.message)
             },
 
             del() {
-                this.deleteMessage(this.message)
+                console.log('REMOVE in Row');
+                this.removeMessageActions(this.message)
             }
         }
     }

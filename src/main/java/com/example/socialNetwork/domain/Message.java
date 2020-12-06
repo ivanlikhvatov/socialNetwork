@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table
-@ToString(of = {"id", "text"})
+@ToString(of = {"id", "text", "creationDate"})
 @EqualsAndHashCode(of = {"id"})
 public class Message {
     @Id

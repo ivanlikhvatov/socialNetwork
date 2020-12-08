@@ -1,6 +1,10 @@
 <template>
     <v-layout align-center>
-        <v-text-field label="Write Something" v-model="text"></v-text-field>
+        <v-text-field
+                label="Write Something"
+                v-model="text"
+                @keyup.enter="save"
+        />
         <v-btn icon @click="save">
             <v-icon>send</v-icon>
         </v-btn>
@@ -38,10 +42,8 @@
                 };
 
                 if (this.id){
-                    console.log('UPDATE in Form');
                     this.updateMessageActions(message)
                 } else {
-                    console.log('CREATE in Form');
                     this.addMessageActions(message)
                 }
                 this.text = '';

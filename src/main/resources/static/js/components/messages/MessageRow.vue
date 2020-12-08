@@ -1,32 +1,51 @@
 <template>
+    <div>
+        <v-list-item>
 
-    <v-row class="my-2">
-        <v-chip color="primary" class="ma-2">
-            <i>({{ message.id }})</i>{{ message.text }}
-            <i style="font-size: x-small">
-                {{new Date(message.creationDate).getHours()}}:{{new Date(message.creationDate).getMinutes()}}
-<!--                                {{message.creationDate}}-->
-            </i>
-        </v-chip>
+            <v-list-item-avatar>
+                <v-img :src="message.author.userpic"></v-img>
+            </v-list-item-avatar>
 
-        <span style="position: absolute; right: 20px">
-            <v-btn icon @click="edit">
-                <v-icon>edit</v-icon>
-            </v-btn>
+            <v-list-item-content>
+                <v-list-item-title v-html="authorName"></v-list-item-title>
+                <v-list-item-subtitle v-html="message.text"></v-list-item-subtitle>
+                <v-list-item-content>
+                    <media v-if="message.link" :message="message"></media>
+                </v-list-item-content>
+            </v-list-item-content>
 
-            <v-btn icon @click="del">
-                <v-icon>delete_forever</v-icon>
-            </v-btn>
-        </span>
-    </v-row>
+            <v-list-item-action>
+                <v-list-item-action-text>
+                    {{new Date(message.creationDate).getHours()}}:{{new Date(message.creationDate).getMinutes()}}
+                </v-list-item-action-text>
+                <div>
+                    <v-btn icon @click="edit">
+                        <v-icon>edit</v-icon>
+                    </v-btn>
 
+                    <v-btn icon @click="del">
+                        <v-icon>delete_forever</v-icon>
+                    </v-btn>
+                </div>
+            </v-list-item-action>
+        </v-list-item>
+
+        <v-divider></v-divider>
+    </div>
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
+    import {mapActions} from 'vuex'
+    import Media from "components/media/Media.vue";
+
     export default {
         props: ['message', 'editMessage'],
-
+        components: { Media },
+        computed: {
+            authorName() {
+                return this.message.author ? this.message.author.name : 'unknown'
+            }
+        },
         methods: {
             ...mapActions(['removeMessageActions']),
             edit() {
@@ -34,7 +53,6 @@
             },
 
             del() {
-                console.log('REMOVE in Row');
                 this.removeMessageActions(this.message)
             }
         }

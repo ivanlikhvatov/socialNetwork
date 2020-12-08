@@ -2,54 +2,63 @@
     <v-app>
         <v-app-bar app>
             <v-toolbar-title>Social-Network</v-toolbar-title>
+
+            <v-btn text
+                   v-if="profile"
+                   :disabled="$route.path === '/'"
+                   @click="showMessages"
+            >
+                Messages
+            </v-btn>
+
             <v-spacer></v-spacer>
-            <span v-if="profile">{{profile.name}}</span>
+
+            <v-btn text
+                   v-if="profile"
+                   :disabled="$route.path === '/profile'"
+                   @click="showProfile"
+            >
+                {{profile.name}}
+            </v-btn>
+
             <v-btn v-if="profile" icon href="/logout">
                 <v-icon>exit_to_app</v-icon>
             </v-btn>
         </v-app-bar>
 
         <v-main>
-            <v-container v-if="!profile">
-                Необходимо авторизоваться через
-                <a href="/login">Google</a>
-            </v-container>
-            <v-container v-if="profile">
-                <messages-list />
-            </v-container>
+            <router-view></router-view>
         </v-main>
-
-
     </v-app>
-
 </template>
 
 <script>
     import { mapState, mapMutations } from 'vuex'
-    import MessagesList from 'components/messages/MessageList.vue'
     import { addHandler } from 'util/ws'
 
     export default {
-        components:{
-            MessagesList
-        },
         computed: mapState(['profile']),
-        methods: mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation']),
+        methods: {
+            ...mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation']),
+            showMessages(){
+                this.$router.push('/')
+            },
+            showProfile(){
+                this.$router.push('/profile')
+            }
+        },
 
         created() {
             addHandler(data => {
                 if (data.objectType === 'MESSAGE'){
                     switch (data.eventType) {
                         case 'CREATE' :
-                            console.log('CREATE in APP');
                             this.addMessageMutation(data.body);
                             break;
                         case 'UPDATE' :
-                            console.log('UPDATE in APP');
                             this.updateMessageMutation(data.body);
                             break;
                         case 'REMOVE' :
-                            console.log('REMOVE in APP');
                             this.removeMessageMutation(data.body);
                             break;
                         default:
@@ -61,6 +70,11 @@
 
 
             })
+        },
+        beforeMount() {
+            if (!this.profile){
+                this.$router.replace('/auth')
+            }
         }
 
 

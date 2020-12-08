@@ -1,6 +1,7 @@
 package com.example.socialNetwork.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,10 +14,14 @@ import java.time.LocalDateTime;
 @Data
 public class User implements Serializable {
     @Id
+    @JsonView(Views.IdName.class)
     private String id;
+    @JsonView(Views.IdName.class)
     private String name;
+    @JsonView(Views.IdName.class)
     private String userpic;
     private String email;
+    @JsonView(Views.IdName.class)
     private String gender;
     private String locale;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

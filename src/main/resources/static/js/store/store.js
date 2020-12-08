@@ -6,11 +6,11 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        messages: frontendData.messages,
-        profile: frontendData.profile
+        messages,
+        ...frontendData
     },
     getters : {
-        sortedMessages: state => state.messages.sort((a, b) => (a.id - b.id))
+        sortedMessages: state => (state.messages || []).sort((a, b) => -(a.id - b.id))
     },
     mutations: {
         addMessageMutation(state, message){
@@ -38,6 +38,22 @@ export default new Vuex.Store({
             }
 
         },
+        addMessagePageMutation(state, messages) {
+            const targetMessages = state.messages
+                .concat(messages)
+                .reduce((res, val) => {
+                    res[val.id] = val
+                    return res
+                }, {})
+
+            state.messages = Object.values(targetMessages)
+        },
+        updateTotalPagesMutation(state, totalPages) {
+            state.totalPages = totalPages
+        },
+        updateCurrentPageMutation(state, currentPage) {
+            state.currentPage = currentPage
+        }
     },
     actions:{
         async addMessageActions({commit, state}, message){
@@ -63,5 +79,15 @@ export default new Vuex.Store({
                 commit('removeMessageMutation', message)
             }
         },
+        async loadPageAction({commit, state}) {
+            const response = await messagesApi.page(state.currentPage + 1)
+            const data = await response.json()
+
+            commit('addMessagePageMutation', data.messages)
+            commit('updateTotalPagesMutation', data.totalPages)
+            commit('updateCurrentPageMutation', Math.min(data.currentPage, data.totalPages - 1))
+        }
+
+
     }
 })

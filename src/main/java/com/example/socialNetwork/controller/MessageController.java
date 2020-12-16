@@ -17,7 +17,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("message")
 public class MessageController {
-    public static final int MESSAGES_PER_PAGE = 10;
+    public static final int MESSAGES_PER_PAGE = 11  ;
 
     private final MessageService messageService;
 
@@ -41,6 +41,7 @@ public class MessageController {
     }
 
     @PostMapping
+    @JsonView(Views.FullMessage.class)
     public Message create(@RequestBody Message message,
                           @AuthenticationPrincipal User user
     ) throws IOException {
@@ -48,6 +49,7 @@ public class MessageController {
     }
 
     @PutMapping("{id}")
+    @JsonView(Views.FullMessage.class)
     public Message update(
             @PathVariable("id") Message messageFromDb,
             @RequestBody Message message

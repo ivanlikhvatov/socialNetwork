@@ -1,8 +1,10 @@
 <template>
     <v-container>
         Необходимо авторизоваться через
-        <a href="/login">Google</a>
+<!--        With Facebook: <a href="/oauth2/authorization/facebook">click here</a>-->
+        <a href="/oauth2/authorization/google">Google</a>
     </v-container>
+
 </template>
 
 <script>

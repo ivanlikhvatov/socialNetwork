@@ -105,6 +105,7 @@ public class MessageService {
         message.setAuthor(user);
         Message updatedMessage = messageRepo.save(message);
         wsSender.accept(EventType.CREATE, updatedMessage);
+
         return updatedMessage;
     }
 

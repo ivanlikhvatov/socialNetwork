@@ -1,6 +1,7 @@
 package com.example.socialNetwork.service;
 
 import com.example.socialNetwork.domain.Message;
+import com.example.socialNetwork.domain.SocialUser;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.domain.Views;
 import com.example.socialNetwork.dto.EventType;

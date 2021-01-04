@@ -1,33 +1,42 @@
 package com.example.socialNetwork.config;
 
-import com.example.socialNetwork.domain.User;
-import com.example.socialNetwork.repo.UserDetailsRepo;
+import com.example.socialNetwork.domain.AuthorityType;
+import com.example.socialNetwork.domain.Role;
+import com.example.socialNetwork.domain.SocialUser;
+import com.example.socialNetwork.repo.UserRepo;
+import com.example.socialNetwork.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    UserDetailsRepo userDetailsRepo;
+    UserRepo userRepo;
+
+    @Autowired
+    UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .antMatcher("/**")
                 .authorizeRequests(a -> a
-                        .antMatchers("/", "/login**", "/js/**", "/error**").permitAll()
+                        .antMatchers("/", "/login**", "/registration", "/js/**", "/error**", "/activate/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(e -> e
@@ -40,7 +49,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> userInfo
                         .oidcUserService(this.oidcUserService())
-                ));
+                ))
+
+                .formLogin()
+                .loginPage("/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .failureUrl("/auth")
+                .permitAll();
     }
 
     public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
@@ -54,19 +70,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             if ("https://accounts.google.com".equals(type)){
                 String id = (String) attributes.get("sub");
 
-                User user = userDetailsRepo.findById(id).orElseGet(() -> {
-                    User newUser = new User();
+                SocialUser user = (SocialUser) userRepo.findById(id).orElseGet(() -> {
+                    SocialUser newUser = new SocialUser();
                     newUser.setId(id);
                     newUser.setName((String) attributes.get("name"));
                     newUser.setEmail((String) attributes.get("email"));
                     newUser.setGender((String) attributes.get("gender"));
                     newUser.setLocale((String) attributes.get("locale"));
                     newUser.setUserpic((String) attributes.get("picture"));
+                    newUser.setRoles(Collections.singleton(Role.USER));
+                    newUser.setAuthorityType(AuthorityType.SOCIAL);
+                    newUser.setActive(true);
 
                     return newUser;
                 });
 
                 user.setLastVisit(LocalDateTime.now());
+                userRepo.save(user);
                 return user;
             }
 
@@ -76,7 +96,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService)
+                .passwordEncoder(NoOpPasswordEncoder.getInstance());
+    }
 
 
 

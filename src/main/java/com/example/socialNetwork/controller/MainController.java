@@ -1,9 +1,8 @@
 package com.example.socialNetwork.controller;
 
-import com.example.socialNetwork.domain.User;
-import com.example.socialNetwork.domain.Views;
+import com.example.socialNetwork.domain.*;
 import com.example.socialNetwork.dto.MessagePageDto;
-import com.example.socialNetwork.repo.UserDetailsRepo;
+import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,14 +16,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
 
 @Controller
 @RequestMapping("/")
 public class MainController {
     private final MessageService messageService;
-    private final UserDetailsRepo userDetailsRepo;
+    private final UserRepo userRepo;
 
     @Value("${spring.profiles.active}")
     private String profile;
@@ -32,8 +31,8 @@ public class MainController {
     private final ObjectWriter userWriter;
 
     @Autowired
-    public MainController(MessageService messageService, UserDetailsRepo userDetailsRepo, ObjectMapper mapper) {
-        this.userDetailsRepo = userDetailsRepo;
+    public MainController(MessageService messageService, UserRepo userRepo, ObjectMapper mapper) {
+        this.userRepo = userRepo;
         this.messageService = messageService;
         this.messageWriter = mapper
                 .setConfig(mapper.getSerializationConfig())
@@ -49,9 +48,19 @@ public class MainController {
         Map<Object, Object> data = new HashMap<>();
 
         if (user != null){
-            User userFromDb = userDetailsRepo.findById(user.getId()).get();
-            String serializedProfile = userWriter.writeValueAsString(userFromDb);
-            model.addAttribute("profile", serializedProfile);
+            System.out.println(user);
+
+            if (user.getAuthorityType().equals(AuthorityType.SOCIAL)){
+                SocialUser userFromDb = (SocialUser) userRepo.findById(user.getId()).get();
+                String serializedProfile = userWriter.writeValueAsString(userFromDb);
+                model.addAttribute("profile", serializedProfile);
+            }
+
+            if (user.getAuthorityType().equals(AuthorityType.CUSTOM)){
+                CustomUser userFromDb = (CustomUser) userRepo.findById(user.getId()).get();
+                String serializedProfile = userWriter.writeValueAsString(userFromDb);
+                model.addAttribute("profile", serializedProfile);
+            }
 
             Sort sort = Sort.by(Sort.Direction.DESC, "id");
             PageRequest pageRequest = PageRequest.of(0, MessageController.MESSAGES_PER_PAGE, sort);
@@ -67,6 +76,13 @@ public class MainController {
             model.addAttribute("profile", "null");
         }
 
+        List<String> emails = new ArrayList<>();
+
+        for (User u : userRepo.findAllByAuthorityType(AuthorityType.CUSTOM)) {
+            emails.add(u.getEmail());
+        }
+
+        model.addAttribute("emails", emails);
         model.addAttribute("frontendData", data);
         model.addAttribute("isDevMode", "dev".equals(profile));
 

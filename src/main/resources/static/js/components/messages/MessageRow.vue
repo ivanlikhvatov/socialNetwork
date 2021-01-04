@@ -3,7 +3,7 @@
         <v-list-item>
 
             <v-list-item-avatar>
-                <v-img :src="message.author.userpic"></v-img>
+                <v-img v-if="message.author != null" :src="message.author.userpic"></v-img>
             </v-list-item-avatar>
 
             <v-list-item-content>

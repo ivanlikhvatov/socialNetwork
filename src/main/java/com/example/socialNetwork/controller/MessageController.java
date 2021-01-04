@@ -1,6 +1,7 @@
 package com.example.socialNetwork.controller;
 
 import com.example.socialNetwork.domain.Message;
+import com.example.socialNetwork.domain.SocialUser;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.domain.Views;
 import com.example.socialNetwork.dto.MessagePageDto;
@@ -45,6 +46,8 @@ public class MessageController {
     public Message create(@RequestBody Message message,
                           @AuthenticationPrincipal User user
     ) throws IOException {
+
+
         return messageService.create(message, user);
     }
 

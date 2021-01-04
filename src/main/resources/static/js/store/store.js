@@ -8,6 +8,7 @@ export default new Vuex.Store({
     state: {
         profile,
         messages,
+        emails,
         ...frontendData,
     },
     getters : {

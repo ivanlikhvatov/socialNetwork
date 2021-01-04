@@ -71,13 +71,12 @@
 
             })
         },
+
         beforeMount() {
             if (!this.profile){
                 this.$router.replace('/auth')
             }
         }
-
-
     }
 </script>
 

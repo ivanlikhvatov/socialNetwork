@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import messagesApi from "../api/messages";
+import usersApi from "../api/users";
 
 Vue.use(Vuex);
+
+var users = null;
 
 export default new Vuex.Store({
     state: {
@@ -10,6 +13,7 @@ export default new Vuex.Store({
         messages,
         emails,
         infoMessage,
+        users,
         ...frontendData,
     },
     getters : {
@@ -56,7 +60,11 @@ export default new Vuex.Store({
         },
         updateCurrentPageMutation(state, currentPage) {
             state.currentPage = currentPage
-        }
+        },
+
+        loadUsersMutation(state, users) {
+            state.messages = Object.values(users)
+        },
     },
     actions:{
         async addMessageActions({commit, state}, message){
@@ -90,8 +98,16 @@ export default new Vuex.Store({
             commit('addMessagePageMutation', data.messages)
             commit('updateTotalPagesMutation', data.totalPages)
             commit('updateCurrentPageMutation', Math.min(data.currentPage, data.totalPages - 1))
-        }
+        },
 
+        async loadUsers({commit, state}) {
+            const response = await usersApi.list()
+            const data = await response.json()
+
+            alert(data)
+
+            commit('loadUsersMutation', data)
+        }
 
     }
 })

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface UserRepo extends JpaRepository<User, String> {
     List<User> findAllByAuthorityType(AuthorityType type);
+    List<User> findAllByAuthorityTypeAndEmailContaining(AuthorityType type, String email);
 }

@@ -17,10 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -89,6 +87,22 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    public void saveUser(User user, Map<String, String> form) {
+        Set<String> roles = Arrays.stream(Role.values())
+                .map(Role::name)
+                .collect(Collectors.toSet());
+
+        user.getRoles().clear();
+
+        for (String key : form.keySet()){
+            if (roles.contains(key)) {
+                user.getRoles().add(Role.valueOf(key));
+            }
+        }
+
+        userRepo.save(user);
+    }
+
     public List<User> findAllByAuthorityType(AuthorityType type) {
         return  userRepo.findAllByAuthorityType(type);
     }
@@ -114,5 +128,13 @@ public class UserService implements UserDetailsService {
         }
 
         return resultFilename;
+    }
+
+    public List<User> findAllByAuthorityTypeAndEmailContaining(String authorityType, String email) {
+        return userRepo.findAllByAuthorityTypeAndEmailContaining(AuthorityType.valueOf(authorityType), email);
+    }
+
+    public List<User> findAll() {
+        return userRepo.findAll();
     }
 }

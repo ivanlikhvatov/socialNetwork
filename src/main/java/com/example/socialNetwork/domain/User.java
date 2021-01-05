@@ -25,30 +25,32 @@ public class User implements Serializable, UserDetails{
     @JsonView(Views.IdName.class)
     private String name;
 
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     private String userpic;
 
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     private String email;
 
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     private String gender;
 
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     private String locale;
 
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     private boolean active;
 
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullProfile.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastVisit;
 
+    @JsonView(Views.FullProfile.class)
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @JsonView(Views.FullProfile.class)
     @Enumerated(EnumType.STRING)
     @Column(name = "authority_type")
     private AuthorityType authorityType;
@@ -57,13 +59,17 @@ public class User implements Serializable, UserDetails{
 //    @JoinColumn(name="user_id")
 //    private User user;
 
+    public boolean isAdmin(){
+        return roles.contains(Role.ADMIN);
+    }
+
     public boolean isActive() {
         return active;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return getRoles();
     }
 
     @Override

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import java.util.*;
 
 @Controller
@@ -39,7 +38,7 @@ public class MainController {
                 .writerWithView(Views.FullMessage.class);
         this.userWriter = mapper
                 .setConfig(mapper.getSerializationConfig())
-                .writerWithView(Views.IdName.class);
+                .writerWithView(Views.FullProfile.class);
     }
 
 
@@ -48,8 +47,6 @@ public class MainController {
         Map<Object, Object> data = new HashMap<>();
 
         if (user != null){
-            System.out.println(user);
-
             if (user.getAuthorityType().equals(AuthorityType.SOCIAL)){
                 SocialUser userFromDb = (SocialUser) userRepo.findById(user.getId()).get();
                 String serializedProfile = userWriter.writeValueAsString(userFromDb);

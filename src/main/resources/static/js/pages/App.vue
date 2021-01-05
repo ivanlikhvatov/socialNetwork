@@ -15,6 +15,14 @@
 
             <v-btn text
                    v-if="profile"
+                   :disabled="$route.path === '/user'"
+                   @click="showUsers"
+            >
+                Список пользователей
+            </v-btn>
+
+            <v-btn text
+                   v-if="profile"
                    :disabled="$route.path === '/profile'"
                    @click="showProfile"
             >
@@ -45,6 +53,9 @@
             },
             showProfile(){
                 this.$router.push('/profile')
+            },
+            showUsers(){
+                this.$router.push('/userList')
             }
         },
 

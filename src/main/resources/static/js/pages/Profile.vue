@@ -5,7 +5,11 @@
                 <div class="title mb-3">User profile</div>
                 <v-layout row justify-space-between>
                     <v-flex class="px-1">
-                        <v-img :src="profile.userpic"></v-img>
+                        <v-img v-if="profile.userpic != null && profile.userpic.match(/http/) != null" :src="profile.userpic" max-width="240px"></v-img>
+                        <v-img v-else-if="profile.userpic != null" :src="'/img/'+profile.userpic" max-width="240px"></v-img>
+                        <v-avatar v-else color="red" size="128" tile>
+                            <span class="white--text headline">{{profile.name.toString()[0]}}</span>
+                        </v-avatar>
                     </v-flex>
 
                     <v-flex class="px-1">

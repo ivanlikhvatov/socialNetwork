@@ -823,6 +823,22 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@growthbunker/vuedarkmode@0.5.9":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@growthbunker/vuedarkmode/-/vuedarkmode-0.5.9.tgz#c592715f9902537aa38466d51f48275bc0f3bb47"
+  integrity sha512-I5dpLxOPEDwLH6COLRI+/1BqaHC4B45L5gSkUMnnLxvNetRzCeMrTAGTO6chGMNsxIuKbtHVQYlFZI3fFEGsbw==
+  dependencies:
+    v-click-outside "2.1.4"
+    v-hotkey "0.6.0"
+    vee-validate "3.0.11"
+
+"@growthbunker/vuesocial@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@growthbunker/vuesocial/-/vuesocial-0.1.2.tgz#cf62e973687f21802c8d930dba1126594b24f57c"
+  integrity sha512-aMzS42G8JIrst9ZO8TZBXR5uKhpgiUC1Z7B44MTGG2miV3hPveMuApYFZf3PYvaLZCdOnXPvgA7G8sbdyAJVRg==
+  dependencies:
+    "@growthbunker/vuedarkmode" "0.5.9"
+
 "@sindresorhus/is@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
@@ -5137,6 +5153,16 @@ uuid@^3.3.2, uuid@^3.4.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
+v-click-outside@2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/v-click-outside/-/v-click-outside-2.1.4.tgz#7d7813b09a0fd4a9d0fbccc2ca12ca7c5591e087"
+  integrity sha512-NbQiwRjJjeKptI1qr1co2Ox44fUWEnj08chR1nw3DVrNCQHjb+sqlevzb1zCXMgb7orTFE0wpiecqMlbOZ15EQ==
+
+v-hotkey@0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/v-hotkey/-/v-hotkey-0.6.0.tgz#265c309e937e27411d1e8e97b96fbbda1be7d1d3"
+  integrity sha512-HsIQa8L5aWB9aJDuHGbCTfIZk5nT7891wtvxUoF3AjT/+Pb7nu3DfhIyO4Vz0jRP8faOJpQn2NkATXAg6hNckA==
+
 v8-compile-cache@^2.1.1:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.2.0.tgz#9471efa3ef9128d2f7c6a7ca39c4dd6b5055b132"
@@ -5146,6 +5172,11 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
+
+vee-validate@3.0.11:
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-3.0.11.tgz#5ffe3d501893801529186642d20241cf632f1341"
+  integrity sha512-2KRLdtM/y+bU2o9KC7cZBGPRUsBxQaoFb3IlBOUkj6l24Gx5XWXxNkhaAXK97BRLOdM4CH/gJYFi9DOm0N7dTQ==
 
 vee-validate@^3.4.5:
   version "3.4.5"

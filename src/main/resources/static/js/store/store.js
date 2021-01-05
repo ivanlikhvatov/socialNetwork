@@ -9,6 +9,7 @@ export default new Vuex.Store({
         profile,
         messages,
         emails,
+        infoMessage,
         ...frontendData,
     },
     getters : {

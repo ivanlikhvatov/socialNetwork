@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .antMatcher("/**")
                 .authorizeRequests(a -> a
-                        .antMatchers("/", "/login**", "/registration", "/js/**", "/error**", "/activate/*").permitAll()
+                        .antMatchers("/", "/login**", "/registration", "/js/**", "/error**", "/activate/*", "/auth", "/loginError", "/img/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(e -> e
@@ -55,7 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .failureUrl("/auth")
+                .failureUrl("/loginError")
                 .permitAll();
     }
 

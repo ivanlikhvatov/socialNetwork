@@ -9,15 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Controller
@@ -31,28 +28,20 @@ public class RegistrationController {
 
     @GetMapping("/registration")
     public String registration(Model model){
-        Map<Object, Object> data = new HashMap<>();
-
-        model.addAttribute("frontendData", data);
-        model.addAttribute("isDevMode", "dev".equals(profile));
-        List<String> emails = new ArrayList<>();
-
-        for (User u : userService.findAllByAuthorityType(AuthorityType.SOCIAL)) {
-            emails.add(u.getEmail());
-        }
-        model.addAttribute("emails", emails);
-
-        model.addAttribute("message", "Вы успешно зарегистрировались, подтвердите свой аккаунт перейдя по ссылке");
-        model.addAttribute("messages", "[]");
-        model.addAttribute("profile", "null");
+        addModelData(model);
         return "index";
     }
 
     @PostMapping("/registration")
-    public String addUser(CustomUser user, Model model) {
-
-
+    public String addUser(
+            CustomUser user,
+            Model model,
+            @RequestParam("file") MultipartFile file
+    ) {
         Map<Object, Object> data = new HashMap<>();
+        List<String> emails = new ArrayList<>();
+        Pattern emailPattern = Pattern.compile("(([A-Za-z0-9]+[A-Za-z0-9_.\\-]+[A-Za-z0-9]+)|([A-Za-z0-9]+))@([A-Za-z0-9]{2,}[.])+(ru|com|org|net)");
+
         model.addAttribute("frontendData", data);
         model.addAttribute("isDevMode", "dev".equals(profile));
 
@@ -65,11 +54,13 @@ public class RegistrationController {
             return "index";
         }
 
-        Pattern emailPattern = Pattern.compile("(([A-Za-z0-9]+[A-Za-z0-9_.\\-]+[A-Za-z0-9]+)|([A-Za-z0-9]+))@([A-Za-z0-9]{2,}[.])+(ru|com|org|net)");
-
         if (!Pattern.matches(emailPattern.toString(), user.getEmail())){
             model.addAttribute("message", "Неккоректные данные");
             return "index";
+        }
+
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            user.setUserpic(userService.loadUserpic(file));
         }
 
         if (!userService.addUser(user)){
@@ -77,15 +68,11 @@ public class RegistrationController {
             return "index";
         }
 
-        List<String> emails = new ArrayList<>();
-
-        for (User u : userService.findAllByAuthorityType(AuthorityType.CUSTOM)) {
-            emails.add(u.getEmail());
-            System.out.println("reg: " + u);
+        for (User customUser : userService.findAllByAuthorityType(AuthorityType.CUSTOM)) {
+            emails.add(customUser.getEmail());
         }
 
         model.addAttribute("emails", emails);
-
         model.addAttribute("message", "Вы успешно зарегистрировались, подтвердите свой аккаунт перейдя по ссылке");
         model.addAttribute("messages", "[]");
         model.addAttribute("profile", "null");
@@ -93,11 +80,12 @@ public class RegistrationController {
         return "index";
     }
 
-//    @GetMapping("loginError")
-//    public String loginError(Model model){
-//        model.addAttribute("message", "Неверный E-mail или пароль, попробуйте ещё раз");
-//        return "index";
-//    }
+    @GetMapping("loginError")
+    public String loginError(Model model){
+        addModelData(model);
+        model.addAttribute("message", "Неверный E-mail или пароль, попробуйте ещё раз");
+        return "index";
+    }
 
     @GetMapping("/activate/{code}")
     public String activate(Model model, @PathVariable String code){
@@ -109,6 +97,23 @@ public class RegistrationController {
             model.addAttribute("message", "Код активации не найден!");
         }
 
+        addModelData(model);
+
         return "index";
+    }
+
+    private void addModelData(Model model) {
+        Map<Object, Object> data = new HashMap<>();
+        List<String> emails = new ArrayList<>();
+
+        for (User u : userService.findAllByAuthorityType(AuthorityType.CUSTOM)) {
+            emails.add(u.getEmail());
+        }
+
+        model.addAttribute("frontendData", data);
+        model.addAttribute("isDevMode", "dev".equals(profile));
+        model.addAttribute("emails", emails);
+        model.addAttribute("messages", "[]");
+        model.addAttribute("profile", "null");
     }
 }

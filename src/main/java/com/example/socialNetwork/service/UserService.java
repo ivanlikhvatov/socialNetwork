@@ -7,14 +7,19 @@ import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.repo.CustomUserRepo;
 import com.example.socialNetwork.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -27,6 +32,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     MailSender mailSender;
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     public boolean addUser(CustomUser user){
         CustomUser userFromDb = customUserRepo.findByEmail(user.getEmail());
@@ -88,5 +96,23 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return customUserRepo.findByEmail(email);
+    }
+
+    public String loadUserpic(MultipartFile file) {
+        File uploadDir = new File(uploadPath);
+
+        if (!uploadDir.exists()){
+            uploadDir.mkdir();
+        }
+        String uuidFile = UUID.randomUUID().toString();
+        String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+        try {
+            file.transferTo(new File(uploadPath + "/" + resultFilename));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return resultFilename;
     }
 }

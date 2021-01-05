@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import VueSocial from "@growthbunker/vuesocial";
 import Vuetify from "vuetify";
 import '@babel/polyfill'
 import 'api/resource'
@@ -13,6 +14,7 @@ if (profile){
 }
 
 Vue.use(Vuetify);
+Vue.use(VueSocial);
 
 new Vue({
     el: '#app',

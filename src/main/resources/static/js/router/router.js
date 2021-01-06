@@ -5,12 +5,14 @@ import Auth from "pages/Auth.vue";
 import Profile from "pages/Profile.vue";
 import Registration from "pages/Registration.vue";
 import UserList from "pages/UserList.vue";
+// import UserInfo from "pages/UserInfo.vue"
 
 Vue.use(VueRouter);
 
 const routes = [
     { path: '/', component: MessagesList},
     { path: '/userList', component: UserList },
+    // { path: '/userInfo', component: UserInfo },
     { path: '/auth', component: Auth },
     { path: '/profile', component: Profile },
     { path: '/registration', component: Registration },

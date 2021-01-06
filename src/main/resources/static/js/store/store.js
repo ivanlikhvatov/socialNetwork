@@ -5,8 +5,6 @@ import usersApi from "../api/users";
 
 Vue.use(Vuex);
 
-var users = null;
-
 export default new Vuex.Store({
     state: {
         profile,
@@ -63,7 +61,7 @@ export default new Vuex.Store({
         },
 
         loadUsersMutation(state, users) {
-            state.messages = Object.values(users)
+            state.users = Object.values(users)
         },
     },
     actions:{
@@ -103,8 +101,6 @@ export default new Vuex.Store({
         async loadUsers({commit, state}) {
             const response = await usersApi.list()
             const data = await response.json()
-
-            alert(data)
 
             commit('loadUsersMutation', data)
         }

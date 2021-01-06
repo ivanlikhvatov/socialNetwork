@@ -41,7 +41,7 @@
 </template>
 
 <script>
-    import { mapState, mapMutations } from 'vuex'
+    import { mapState, mapMutations, mapActions } from 'vuex'
     import { addHandler } from 'util/ws'
 
     export default {

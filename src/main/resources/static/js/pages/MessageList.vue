@@ -2,7 +2,7 @@
     <v-container>
         <v-layout align-content-space-between column>
 
-            <message-form :messageAttr="message" />
+            <message-form :messageAttr="message"/>
 
             <v-layout row>
                 <v-flex>

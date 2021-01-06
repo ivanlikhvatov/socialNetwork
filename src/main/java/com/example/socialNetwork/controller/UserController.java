@@ -28,16 +28,14 @@ public class UserController {
         return userService.findAll();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    @JsonView(Views.FullProfile.class)
     @GetMapping("{user}")
-    public String userEditForm(@PathVariable User user, Model model){
-        model.addAttribute("user", user);
-        model.addAttribute("roles", Role.values());
-
-        return "index";
+    public User userEditForm(@PathVariable User user){
+        return user;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public String userSave(
             @RequestParam Map<String, String> form,

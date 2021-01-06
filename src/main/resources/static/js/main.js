@@ -8,6 +8,7 @@ import App from 'pages/App.vue'
 import store from 'store/store'
 import { connect } from 'util/ws'
 import 'vuetify/dist/vuetify.min.css'
+import UserInfo from "pages/UserInfo.vue";
 
 if (profile){
     connect();
@@ -21,5 +22,5 @@ new Vue({
     vuetify : new Vuetify(),
     router,
     store,
-    render: a => a(App)
+    render: a => a(App),
 });

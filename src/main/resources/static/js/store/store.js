@@ -104,6 +104,5 @@ export default new Vuex.Store({
 
             commit('loadUsersMutation', data)
         }
-
     }
 })

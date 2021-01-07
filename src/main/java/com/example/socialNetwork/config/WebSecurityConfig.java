@@ -25,6 +25,7 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
+//securedEnabled = true
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -83,12 +84,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     newUser.setRoles(Collections.singleton(Role.USER));
                     newUser.setAuthorityType(AuthorityType.SOCIAL);
                     newUser.setActive(true);
+                    newUser.setNonLocked(true);
 
                     return newUser;
                 });
 
                 user.setLastVisit(LocalDateTime.now());
                 userRepo.save(user);
+
                 return user;
             }
 

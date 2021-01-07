@@ -43,6 +43,7 @@ public class UserService implements UserDetailsService {
 
         user.setId(UUID.randomUUID().toString());
         user.setActive(false);
+        user.setNonLocked(true);
         user.setRoles(Collections.singleton(Role.USER));
         user.setAuthorityType(AuthorityType.CUSTOM);
         user.setActivationCode(UUID.randomUUID().toString());
@@ -98,6 +99,16 @@ public class UserService implements UserDetailsService {
             if (roles.contains(key)) {
                 user.getRoles().add(Role.valueOf(key));
             }
+        }
+
+        String locked = form.get("locked");
+
+        if (locked != null && locked.equals("true")){
+            user.setNonLocked(false);
+        }
+
+        if (locked == null){
+            user.setNonLocked(true);
         }
 
         userRepo.save(user);

@@ -3,11 +3,8 @@ package com.example.socialNetwork.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
-import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -55,6 +52,9 @@ public class User implements Serializable, UserDetails{
     @Column(name = "authority_type")
     private AuthorityType authorityType;
 
+    @JsonView(Views.FullProfile.class)
+    private boolean nonLocked;
+
 //    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
 //    @JoinColumn(name="user_id")
 //    private User user;
@@ -89,7 +89,7 @@ public class User implements Serializable, UserDetails{
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return nonLocked;
     }
 
     @Override

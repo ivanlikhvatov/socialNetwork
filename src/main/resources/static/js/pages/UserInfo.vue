@@ -60,6 +60,7 @@
                     <v-list-item>
                         <v-list-item-content>
                             <v-switch
+                                    color="red"
                                     v-model="lockedSwitch"
                                     label="Заблокировать"
                                     name="locked"

@@ -5,8 +5,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -17,8 +20,7 @@ import java.util.Map;
 @Entity
 @Table(name = "social_usr")
 @Data
-public class SocialUser extends User implements OidcUser{
-
+public class SocialUser extends User implements OidcUser {
     @Override
     public Map<String, Object> getClaims() {
         return null;

@@ -1,38 +1,73 @@
 <template>
     <v-app>
-        <v-app-bar app>
-            <v-toolbar-title>Social-Network</v-toolbar-title>
-
-            <v-btn text
-                   v-if="profile"
-                   :disabled="$route.path === '/'"
-                   @click="showMessages"
-            >
-                Messages
+        <v-app-bar app
+                   color="primary"
+                   dark
+        >
+            <v-btn v-if="profile" icon @click="getMarginTop">
+                <v-icon>dehaze</v-icon>
             </v-btn>
+
+            <v-toolbar-title>NetLife</v-toolbar-title>
 
             <v-spacer></v-spacer>
 
-            <v-btn text
-                   v-if="profile"
-                   :disabled="$route.path === '/user'"
-                   @click="showUsers"
-            >
-                Список пользователей
+            <v-btn v-if="profile" icon href="/logout">
+                <v-icon>exit_to_app</v-icon>
             </v-btn>
+        </v-app-bar>
+
+        <v-navigation-drawer
+                v-model="drawer"
+                absolute
+                temporary
+                id="navDrawer"
+        >
+            <v-list-item v-if="profile">
+                <v-list-item-avatar>
+                    <v-img v-if="profile.userpic != null && profile.userpic.match(/http/) != null" :src="profile.userpic"></v-img>
+                    <v-img v-else-if="profile.userpic != null" :src="'/img/'+profile.userpic" max-width="240px"></v-img>
+                    <v-avatar v-else color="red">
+                        <span class="white--text headline">{{profile.name.toString()[0]}}</span>
+                    </v-avatar>
+                </v-list-item-avatar>
+
+                <v-list-item-content>
+                    <v-list-item-title>{{profile.name}}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
+            <v-divider></v-divider>
+
 
             <v-btn text
                    v-if="profile"
                    :disabled="$route.path === '/profile'"
                    @click="showProfile"
             >
-                {{profile.name}}
+                <v-icon color="primary" left>perm_identity</v-icon>
+                <span>Профиль</span>
             </v-btn>
 
-            <v-btn v-if="profile" icon href="/logout">
-                <v-icon>exit_to_app</v-icon>
+            <v-btn text
+                    v-if="profile"
+                    :disabled="$route.path === '/'"
+                    @click="showMessages"
+            >
+                <v-icon color="primary" left>message</v-icon>
+                <span>Общий чат</span>
             </v-btn>
-        </v-app-bar>
+
+            <v-btn text
+                   v-if="profile && profile.roles.indexOf('ADMIN') !== -1"
+                   :disabled="$route.path === '/userList'"
+                   @click="showUsers"
+            >
+                <v-icon color="primary" left>supervisor_account</v-icon>
+                <span>Пользователи</span>
+            </v-btn>
+
+        </v-navigation-drawer>
 
         <v-main>
             <router-view></router-view>
@@ -45,6 +80,11 @@
     import { addHandler } from 'util/ws'
 
     export default {
+        data: () => ({
+            drawer: false,
+            group: null,
+        }),
+
         computed: mapState(['profile']),
         methods: {
             ...mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation']),
@@ -56,6 +96,14 @@
             },
             showUsers(){
                 this.$router.push('/userList')
+            },
+            getMarginTop(){
+                this.drawer = true
+                const el = document.documentElement
+
+                document.getElementById("navDrawer").style.height = window.innerHeight +"px"
+                document.getElementById("navDrawer").style.marginTop = (el.scrollTop).toString() + "px"
+
             }
         },
 

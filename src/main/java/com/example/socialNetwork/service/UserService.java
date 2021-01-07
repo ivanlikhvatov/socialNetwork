@@ -9,6 +9,7 @@ import com.example.socialNetwork.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService{
     @Autowired
     private CustomUserRepo customUserRepo;
 
@@ -59,7 +60,7 @@ public class UserService implements UserDetailsService {
         if (!StringUtils.isEmpty(user.getEmail())){
             String message = String.format(
                     "Здравствуйте, %s \n" + "Приветствуем Вас в нашей социальной сети. Пожалуйста посетите следующую ссылку: http://localhost:8080/activate/%s",
-                    user.getUsername(),
+                    user.getName(),
                     user.getActivationCode()
             );
 
@@ -78,10 +79,6 @@ public class UserService implements UserDetailsService {
 
         user.setActivationCode(null);
         user.setActive(true);
-
-//        if (newEmail != null){
-//            user.setEmail(newEmail);
-//        }
 
         customUserRepo.save(user);
 
@@ -105,9 +102,26 @@ public class UserService implements UserDetailsService {
 
         if (locked != null && locked.equals("true")){
             user.setNonLocked(false);
+            if (!StringUtils.isEmpty(user.getEmail())){
+                String message = String.format(
+                        "Здравствуйте, %s \n" + "Ваш аккаунт был заблокирован по причине нарушения правил нашего чата",
+                        user.getName()
+                );
+
+                mailSender.send(user.getEmail(), "Activation Code", message);
+            }
         }
 
         if (locked == null){
+            if (!user.isAccountNonLocked() && !StringUtils.isEmpty(user.getEmail())){
+                String message = String.format(
+                        "Здравствуйте, %s \n" + "Ваш аккаунт разблокирован, пожалуйста соблюдайте наши правила",
+                        user.getName()
+                );
+
+                mailSender.send(user.getEmail(), "Activation Code", message);
+            }
+
             user.setNonLocked(true);
         }
 
@@ -147,5 +161,9 @@ public class UserService implements UserDetailsService {
 
     public List<User> findAll() {
         return userRepo.findAll();
+    }
+
+    public User findById(String id){
+        return userRepo.findById(id).orElseGet(User::new);
     }
 }

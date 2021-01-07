@@ -6,12 +6,12 @@
                     <v-card>
                         <v-list two-line>
                             <user-row v-for="user in users"
+                                      v-if="user.id !== 'bot'"
                                       :user="user"
                                       :key="user.id"
                                       :users="users"
                                       :editUser="editUser"
                             >
-
                             </user-row>
                         </v-list>
                     </v-card>

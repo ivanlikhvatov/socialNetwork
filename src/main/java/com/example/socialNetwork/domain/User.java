@@ -59,6 +59,7 @@ public class User implements Serializable, UserDetails{
 //    @JoinColumn(name="user_id")
 //    private User user;
 
+    @JsonView(Views.FullProfile.class)
     public boolean isAdmin(){
         return roles.contains(Role.ADMIN);
     }

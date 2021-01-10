@@ -1,7 +1,8 @@
 package com.example.socialNetwork.controller;
 
 import com.example.socialNetwork.domain.*;
-import com.example.socialNetwork.dto.MessagePageDto;
+import com.example.socialNetwork.dto.AuthorityType;
+import com.example.socialNetwork.dto.GeneralMessagePageDto;
 import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,13 +62,14 @@ public class MainController {
 
             Sort sort = Sort.by(Sort.Direction.DESC, "id");
             PageRequest pageRequest = PageRequest.of(0, MessageController.MESSAGES_PER_PAGE, sort);
-            MessagePageDto messagePageDto = messageService.findAll(pageRequest);
+            GeneralMessagePageDto generalMessagePageDto = messageService.findGeneralMessages(pageRequest);
+            System.out.println("main");
 
-            String messages = messageWriter.writeValueAsString(messagePageDto.getMessages());
+            String messages = messageWriter.writeValueAsString(generalMessagePageDto.getMessages());
 
             model.addAttribute("messages", messages);
-            data.put("currentPage", messagePageDto.getCurrentPage());
-            data.put("totalPages", messagePageDto.getTotalPages());
+            data.put("currentPage", generalMessagePageDto.getCurrentPage());
+            data.put("totalPages", generalMessagePageDto.getTotalPages());
         } else {
             model.addAttribute("messages", "[]");
             model.addAttribute("profile", "null");

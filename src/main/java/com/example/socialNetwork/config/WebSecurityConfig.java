@@ -1,7 +1,7 @@
 package com.example.socialNetwork.config;
 
-import com.example.socialNetwork.domain.AuthorityType;
-import com.example.socialNetwork.domain.Role;
+import com.example.socialNetwork.dto.AuthorityType;
+import com.example.socialNetwork.dto.Role;
 import com.example.socialNetwork.domain.SocialUser;
 import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.UserService;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;

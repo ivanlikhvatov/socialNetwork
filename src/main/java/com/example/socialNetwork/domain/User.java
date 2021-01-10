@@ -1,5 +1,7 @@
 package com.example.socialNetwork.domain;
 
+import com.example.socialNetwork.dto.AuthorityType;
+import com.example.socialNetwork.dto.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;

@@ -16,7 +16,7 @@
                                          :key="message.id"
                                          :message="message"
                                          :editMessage="editMessage"/>
-                                <lazy-loader></lazy-loader>
+                                <general-lazy-loader></general-lazy-loader>
                             </v-list-item-group>
                         </v-list>
                     </v-card>
@@ -29,13 +29,13 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import MessageRow from 'components/messages/MessageRow.vue'
-    import MessageForm from 'components/messages/MessageForm.vue'
-    import LazyLoader from "../components/LazyLoader.vue";
+    import MessageRow from 'components/messages/GeneralMessageRow.vue'
+    import MessageForm from 'components/messages/GeneralMessageForm.vue'
+    import GeneralLazyLoader from "../components/GeneralLazyLoader.vue";
 
     export default {
         components: {
-            LazyLoader,
+            GeneralLazyLoader,
             MessageRow,
             MessageForm
         },

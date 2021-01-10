@@ -1,15 +1,14 @@
 package com.example.socialNetwork.service;
 
-import com.example.socialNetwork.domain.AuthorityType;
+import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.domain.CustomUser;
-import com.example.socialNetwork.domain.Role;
+import com.example.socialNetwork.dto.Role;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.repo.CustomUserRepo;
 import com.example.socialNetwork.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

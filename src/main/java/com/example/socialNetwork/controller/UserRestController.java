@@ -1,19 +1,14 @@
 package com.example.socialNetwork.controller;
 
-import com.example.socialNetwork.domain.Role;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.domain.Views;
 import com.example.socialNetwork.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("user")

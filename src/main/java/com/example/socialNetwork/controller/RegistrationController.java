@@ -1,6 +1,6 @@
 package com.example.socialNetwork.controller;
 
-import com.example.socialNetwork.domain.AuthorityType;
+import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.domain.CustomUser;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.service.UserService;

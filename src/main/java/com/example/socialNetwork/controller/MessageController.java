@@ -1,10 +1,10 @@
 package com.example.socialNetwork.controller;
 
-import com.example.socialNetwork.domain.Message;
-import com.example.socialNetwork.domain.User;
-import com.example.socialNetwork.domain.Views;
-import com.example.socialNetwork.dto.MessagePageDto;
-import com.example.socialNetwork.repo.UserRepo;
+import com.example.socialNetwork.domain.*;
+import com.example.socialNetwork.dto.GeneralMessagePageDto;
+import com.example.socialNetwork.dto.GroupMessagePageDto;
+import com.example.socialNetwork.dto.MessageType;
+import com.example.socialNetwork.dto.PrivateMessagePageDto;
 import com.example.socialNetwork.service.MessageService;
 import com.example.socialNetwork.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("message")
@@ -31,12 +32,33 @@ public class MessageController {
         this.userService = userService;
     }
 
-    @GetMapping
+    @GetMapping("/general")
     @JsonView(Views.FullMessage.class)
-    public MessagePageDto list(
+    public GeneralMessagePageDto generalList(
             @PageableDefault(size = MESSAGES_PER_PAGE, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
     ){
-        return messageService.findAll(pageable);
+        System.out.println("message");
+        return messageService.findGeneralMessages(pageable);
+    }
+
+    @GetMapping("/private")
+    @JsonView(Views.FullMessage.class)
+    public PrivateMessagePageDto privateList(
+            @PageableDefault(size = MESSAGES_PER_PAGE, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal User author,
+            User addressee
+    ){
+        return messageService.findPrivateMessages(addressee, author, pageable);
+    }
+
+    @GetMapping("/group")
+    @JsonView(Views.FullMessage.class)
+    public GroupMessagePageDto groupList(
+            @PageableDefault(size = MESSAGES_PER_PAGE, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal User author,
+            List<User> addresses
+    ){
+        return messageService.findGroupMessages(addresses, author, pageable);
     }
 
     @GetMapping("{id}")
@@ -45,24 +67,54 @@ public class MessageController {
         return message;
     }
 
-    @PostMapping
+    @PostMapping("{type}")
     @JsonView(Views.FullMessage.class)
     public Message create(@RequestBody Message message,
-                          @AuthenticationPrincipal User user
+                          @AuthenticationPrincipal User user,
+                          @PathVariable("type") MessageType type
     ) throws IOException {
         User userDb = userService.findById(user.getId());
 
         if (!userDb.isAccountNonLocked()){
-            Message errMessage = new Message();
+            GeneralMessage errMessage = new GeneralMessage();
             User errUser = userService.findById("bot");
 
             errMessage.setCreationDate(LocalDateTime.now());
             errMessage.setText(user.getName() + ", Ваш аккаунт был заблокирован из-за нарушения правил нашего чата, вы можете написать администратору, либо связаться с нами по почте");
+            errMessage.setMessageType(type);
+            errMessage.setAuthor(errUser);
 
-            return messageService.create(errMessage, errUser);
+            return messageService.create(errMessage);
         }
 
-        return messageService.create(message, user);
+        if (MessageType.GENERAL.equals(type)){
+            GeneralMessage gm = new GeneralMessage();
+            gm.setText(message.getText());
+            gm.setAuthor(user);
+            gm.setMessageType(type);
+
+            return messageService.create(gm);
+        }
+
+        if (MessageType.PRIVATE.equals(type)){
+            PrivateMessage pm = new PrivateMessage();
+            pm.setText(message.getText());
+            pm.setAuthor(user);
+            pm.setMessageType(type);
+
+            return messageService.create(pm);
+        }
+
+        if (MessageType.GROUP.equals(type)){
+            GroupMessage gm = new GroupMessage();
+            gm.setText(message.getText());
+            gm.setAuthor(user);
+            gm.setMessageType(type);
+
+            return messageService.create(gm);
+        }
+
+        return null;
     }
 
     @PutMapping("{id}")
@@ -73,6 +125,7 @@ public class MessageController {
             @AuthenticationPrincipal User user
     ) throws IOException {
         User userDb = userService.findById(user.getId());
+        message.setMessageType(MessageType.GENERAL);//TODO переделать
 
         if (!userDb.isAccountNonLocked()){
             Message errMessage = new Message();
@@ -80,8 +133,9 @@ public class MessageController {
 
             errMessage.setCreationDate(LocalDateTime.now());
             errMessage.setText(user.getName() + ", Ваш аккаунт был заблокирован из-за нарушения правил нашего чата, вы можете написать администратору, либо связаться с нами по почте");
+            errMessage.setAuthor(errUser);
 
-            return messageService.create(errMessage, errUser);
+            return messageService.create(errMessage);
         }
 
         return messageService.update(messageFromDb, message);
@@ -97,8 +151,9 @@ public class MessageController {
 
             errMessage.setCreationDate(LocalDateTime.now());
             errMessage.setText(user.getName() + ", Ваш аккаунт был заблокирован из-за нарушения правил нашего чата, вы можете написать администратору, либо связаться с нами по почте");
+            errMessage.setAuthor(errUser);
 
-            messageService.create(errMessage, errUser);
+            messageService.create(errMessage);
             return;
         }
 

@@ -1,5 +1,7 @@
 package com.example.socialNetwork.domain;
 
+import com.example.socialNetwork.dto.AuthorityType;
+import com.example.socialNetwork.dto.MessageType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
@@ -10,7 +12,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table
+@Table(name = "message")
 @ToString(of = {"id", "text", "creationDate"})
 @EqualsAndHashCode(of = {"id"})
 @Data
@@ -28,7 +30,7 @@ public class Message {
     private LocalDateTime creationDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id")
     @JsonView(Views.FullMessage.class)
     private User author;
 
@@ -40,4 +42,9 @@ public class Message {
     private String linkDescription;
     @JsonView(Views.FullMessage.class)
     private String linkCover;
+
+    @JsonView(Views.FullMessage.class)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "message_type")
+    private MessageType messageType;
 }

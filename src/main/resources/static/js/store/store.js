@@ -66,7 +66,7 @@ export default new Vuex.Store({
     },
     actions:{
         async addMessageActions({commit, state}, message){
-            const result = await messagesApi.add(message)
+            const result = await messagesApi.addGeneral(message)
             const data = await result.json()
             const index = state.messages.findIndex(item => item.id === data.id);
 
@@ -79,6 +79,7 @@ export default new Vuex.Store({
         },
         async updateMessageActions({commit}, message){
             const result = await messagesApi.update(message)
+            console.log(result)
             const data = await result.json()
 
             commit('updateMessageMutation', data)
@@ -89,8 +90,17 @@ export default new Vuex.Store({
                 commit('removeMessageMutation', message)
             }
         },
-        async loadPageAction({commit, state}) {
-            const response = await messagesApi.page(state.currentPage + 1)
+        async loadGeneralPageAction({commit, state}) {
+            const response = await messagesApi.generalMessagePage(state.currentPage + 1)
+            const data = await response.json()
+
+            commit('addMessagePageMutation', data.messages)
+            commit('updateTotalPagesMutation', data.totalPages)
+            commit('updateCurrentPageMutation', Math.min(data.currentPage, data.totalPages - 1))
+        },
+
+        async loadPrivatePageAction({commit, state}) {
+            const response = await messagesApi.privateMessagePage(state.currentPage + 1)
             const data = await response.json()
 
             commit('addMessagePageMutation', data.messages)

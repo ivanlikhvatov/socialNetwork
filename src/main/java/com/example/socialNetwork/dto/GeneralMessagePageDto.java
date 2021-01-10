@@ -1,6 +1,6 @@
 package com.example.socialNetwork.dto;
 
-import com.example.socialNetwork.domain.Message;
+import com.example.socialNetwork.domain.GeneralMessage;
 import com.example.socialNetwork.domain.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
@@ -13,8 +13,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @JsonView(Views.FullMessage.class)
-public class MessagePageDto {
-    private List<Message> messages;
+public class GeneralMessagePageDto {
+    private List<GeneralMessage> messages;
     private int currentPage;
     private int totalPages;
 }

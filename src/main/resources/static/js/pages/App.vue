@@ -52,10 +52,19 @@
             <v-btn text
                     v-if="profile"
                     :disabled="$route.path === '/'"
-                    @click="showMessages"
+                    @click="showGeneralMessages"
             >
                 <v-icon color="primary" left>message</v-icon>
                 <span>Общий чат</span>
+            </v-btn>
+
+            <v-btn text
+                   v-if="profile"
+                   :disabled="$route.path === '/privateMessages'"
+                   @click="showPrivateMessages"
+            >
+                <v-icon color="primary" left>message</v-icon>
+                <span>Личные сообщения</span>
             </v-btn>
 
             <v-btn text
@@ -88,8 +97,11 @@
         computed: mapState(['profile']),
         methods: {
             ...mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation']),
-            showMessages(){
+            showGeneralMessages(){
                 this.$router.push('/')
+            },
+            showPrivateMessages(){
+                this.$router.push('/privateMessages')
             },
             showProfile(){
                 this.$router.push('/profile')

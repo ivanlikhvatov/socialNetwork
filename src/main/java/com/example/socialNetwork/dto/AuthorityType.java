@@ -1,4 +1,4 @@
-package com.example.socialNetwork.domain;
+package com.example.socialNetwork.dto;
 
 public enum  AuthorityType {
     CUSTOM, SOCIAL

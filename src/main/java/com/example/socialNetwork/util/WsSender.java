@@ -1,6 +1,8 @@
 package com.example.socialNetwork.util;
 
 
+import com.example.socialNetwork.domain.GeneralMessage;
+import com.example.socialNetwork.domain.PrivateMessage;
 import com.example.socialNetwork.dto.EventType;
 import com.example.socialNetwork.dto.ObjectType;
 import com.example.socialNetwork.dto.WsEventDto;
@@ -35,9 +37,36 @@ public class WsSender {
                 throw new RuntimeException();
             }
 
-            template.convertAndSend("/topic/activity",
-                    new WsEventDto(objectType, eventType, value)
-            );
+
+            if (payload.getClass().equals(PrivateMessage.class)){
+                PrivateMessage privateMessage = (PrivateMessage) payload;
+
+                String addressee = privateMessage.getAddressee().getId();
+                String author = privateMessage.getAuthor().getId();
+
+
+                template.convertAndSend("/topic/activity/" + addressee,
+                        new WsEventDto(objectType, eventType, value)
+                );
+
+                template.convertAndSend("/topic/activity/" + author,
+                        new WsEventDto(objectType, eventType, value)
+                );
+            }
+
+            if (payload.getClass().equals(GeneralMessage.class)){
+                template.convertAndSend("/topic/activity",
+                        new WsEventDto(objectType, eventType, value)
+                );
+            }
+
+            if (payload.getClass().equals(String.class)){
+                String id = (String) payload;
+
+                template.convertAndSend("/topic/activity/" + id,
+                        new WsEventDto(objectType, eventType, value)
+                );
+            }
         };
     }
 }

@@ -3,6 +3,7 @@ package com.example.socialNetwork.config;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.dto.Role;
 import com.example.socialNetwork.domain.SocialUser;
+import com.example.socialNetwork.exceptions.NotFoundException;
 import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     return newUser;
                 });
 
+                if (!user.isAccountNonLocked()){
+                    throw new NotFoundException();
+                }
+
                 user.setLastVisit(LocalDateTime.now());
                 userRepo.save(user);
 
@@ -106,105 +111,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    @Bean
-//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(WebClient rest) {
-//        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-//        return request -> {
-//            OAuth2User user = delegate.loadUser(request);
-//            if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
-//                return user;
-//            }
-//
-//            OAuth2AuthorizedClient client = new OAuth2AuthorizedClient
-//                    (request.getClientRegistration(), user.getName(), request.getAccessToken());
-//            String url = user.getAttribute("organizations_url");
-//            List<Map<String, Object>> orgs = rest
-//                    .get().uri(url)
-//                    .attributes(oauth2AuthorizedClient(client))
-//                    .retrieve()
-//                    .bodyToMono(List.class)
-//                    .block();
-//
-//            if (orgs.stream().anyMatch(org -> "spring-projects".equals(org.get("login")))) {
-//                return user;
-//            }
-//
-//            throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", "Not in Spring Team", ""));
-//        };
-//    }
-//
-//    @Bean
-//    public WebClient rest(ClientRegistrationRepository clients, OAuth2AuthorizedClientRepository authz) {
-//        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
-//                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clients, authz);
-//        return WebClient.builder()
-//                .filter(oauth2).build();
-//    }
-
-
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                .antMatcher("/**")
-//                .authorizeRequests()
-//                .antMatchers("/", "/login**", "/js/**", "/error**").permitAll()
-//                .anyRequest().authenticated()
-//                .and().logout().logoutSuccessUrl("/").permitAll()
-//                .and()
-//                .csrf().disable();
-//    }
-
-//    @Bean
-//    public PrincipalExtractor principalExtractor(UserDetailsRepo userDetailsRepo){
-//
-//        return map -> {
-//            System.out.println("jlkjlkjlkj");
-//
-//            String id = (String) map.get("sub");
-//            GoogleAuthUser user = userDetailsRepo.findById(id).orElseGet(() -> {
-//                GoogleAuthUser newUser = new GoogleAuthUser();
-//                newUser.setId(id);
-//                newUser.setName((String) map.get("name"));
-//                newUser.setEmail((String) map.get("email"));
-//                newUser.setGender((String) map.get("gender"));
-//                newUser.setLocale((String) map.get("locale"));
-//                newUser.setUserpic((String) map.get("picture"));
-//
-//                return newUser;
-//            });
-//
-//            user.setLastVisit(LocalDateTime.now());
-//            return userDetailsRepo.save(user);
-//        };
-//    }
 }

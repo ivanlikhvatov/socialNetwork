@@ -135,6 +135,8 @@
                         default:
                             console.error('Looks like event type is unknown "${data.eventType}" ')
                     }
+                } else if (data.objectType === 'LOCKED'){
+                    window.location.reload()
                 } else {
                     console.error('Looks like the object type is unknown "${data.bodyType}" ')
                 }

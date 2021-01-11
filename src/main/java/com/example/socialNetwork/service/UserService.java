@@ -1,16 +1,22 @@
 package com.example.socialNetwork.service;
 
+import com.example.socialNetwork.domain.Message;
+import com.example.socialNetwork.domain.Views;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.domain.CustomUser;
+import com.example.socialNetwork.dto.EventType;
+import com.example.socialNetwork.dto.ObjectType;
 import com.example.socialNetwork.dto.Role;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.repo.CustomUserRepo;
 import com.example.socialNetwork.repo.UserRepo;
+import com.example.socialNetwork.util.WsSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,21 +24,28 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService{
-    @Autowired
-    private CustomUserRepo customUserRepo;
-
-    @Autowired
-    private UserRepo userRepo;
-
-    @Autowired
-    MailSender mailSender;
-
     @Value("${upload.path}")
     private String uploadPath;
+
+    private final FindByIndexNameSessionRepository sessionRepository;
+    private final BiConsumer<EventType, String> wsSender;
+    private final CustomUserRepo customUserRepo;
+    private final UserRepo userRepo;
+    private final MailSender mailSender;
+
+    @Autowired
+    public UserService(FindByIndexNameSessionRepository sessionRepository, CustomUserRepo customUserRepo, UserRepo userRepo, MailSender mailSender, WsSender wsSender) {
+        this.sessionRepository = sessionRepository;
+        this.customUserRepo = customUserRepo;
+        this.userRepo = userRepo;
+        this.mailSender = mailSender;
+        this.wsSender = wsSender.getSender(ObjectType.LOCKED, Views.FullProfile.class);
+    }
 
     public boolean addUser(CustomUser user){
         CustomUser userFromDb = customUserRepo.findByEmail(user.getEmail());
@@ -109,6 +122,12 @@ public class UserService implements UserDetailsService{
 
                 mailSender.send(user.getEmail(), "Activation Code", message);
             }
+
+            sessionRepository.findByPrincipalName(user.getId())
+                    .keySet()
+                    .forEach(session -> sessionRepository.deleteById(session.toString()));
+
+            wsSender.accept(EventType.LOGOUT, user.getId());
         }
 
         if (locked == null){

@@ -1,6 +1,4 @@
 <template>
-    <!--        With Facebook: <a href="/oauth2/authorization/facebook">click here</a>-->
-    <!--        <a href="/oauth2/authorization/vk">Vk</a>-->
     <v-container  mt-10>
 
         <v-row justify="space-around">

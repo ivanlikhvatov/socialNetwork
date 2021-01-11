@@ -68,7 +68,7 @@
             </v-btn>
 
             <v-btn text
-                   v-if="profile && profile.roles.indexOf('ADMIN') !== -1"
+                   v-if="profile"
                    :disabled="$route.path === '/userList'"
                    @click="showUsers"
             >

@@ -5,6 +5,7 @@ import com.example.socialNetwork.dto.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
@@ -38,6 +39,9 @@ public class User implements Serializable, UserDetails{
 
     @JsonView(Views.FullProfile.class)
     private boolean active;
+
+    @JsonView(Views.FullProfile.class)
+    private boolean online;
 
     @JsonView(Views.FullProfile.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -104,4 +108,6 @@ public class User implements Serializable, UserDetails{
     public boolean isEnabled() {
         return isActive();
     }
+
+
 }

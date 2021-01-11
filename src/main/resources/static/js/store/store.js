@@ -113,6 +113,6 @@ export default new Vuex.Store({
             const data = await response.json()
 
             commit('loadUsersMutation', data)
-        }
+        },
     }
 })

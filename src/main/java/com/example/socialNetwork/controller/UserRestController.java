@@ -16,11 +16,16 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @JsonView(Views.FullProfile.class)
     @GetMapping
     public List<User> userList(){
         return userService.findAll();
+    }
+
+    @JsonView(Views.FullProfile.class)
+    @GetMapping("/active")
+    public List<User> activeUserList(){
+        return userService.findActive();
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

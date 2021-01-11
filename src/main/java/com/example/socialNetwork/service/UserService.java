@@ -1,6 +1,5 @@
 package com.example.socialNetwork.service;
 
-import com.example.socialNetwork.domain.Message;
 import com.example.socialNetwork.domain.Views;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.domain.CustomUser;
@@ -32,15 +31,15 @@ public class UserService implements UserDetailsService{
     @Value("${upload.path}")
     private String uploadPath;
 
-    private final FindByIndexNameSessionRepository sessionRepository;
+    private final FindByIndexNameSessionRepository findByIndexNameSessionRepository;
     private final BiConsumer<EventType, String> wsSender;
     private final CustomUserRepo customUserRepo;
     private final UserRepo userRepo;
     private final MailSender mailSender;
 
     @Autowired
-    public UserService(FindByIndexNameSessionRepository sessionRepository, CustomUserRepo customUserRepo, UserRepo userRepo, MailSender mailSender, WsSender wsSender) {
-        this.sessionRepository = sessionRepository;
+    public UserService(FindByIndexNameSessionRepository findByIndexNameSessionRepository, CustomUserRepo customUserRepo, UserRepo userRepo, MailSender mailSender, WsSender wsSender) {
+        this.findByIndexNameSessionRepository = findByIndexNameSessionRepository;
         this.customUserRepo = customUserRepo;
         this.userRepo = userRepo;
         this.mailSender = mailSender;
@@ -123,9 +122,9 @@ public class UserService implements UserDetailsService{
                 mailSender.send(user.getEmail(), "Activation Code", message);
             }
 
-            sessionRepository.findByPrincipalName(user.getId())
+            findByIndexNameSessionRepository.findByPrincipalName(user.getId())
                     .keySet()
-                    .forEach(session -> sessionRepository.deleteById(session.toString()));
+                    .forEach(session -> findByIndexNameSessionRepository.deleteById(session.toString()));
 
             wsSender.accept(EventType.LOGOUT, user.getId());
         }
@@ -152,7 +151,14 @@ public class UserService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return customUserRepo.findByEmail(email);
+        CustomUser user = customUserRepo.findByEmail(email);
+
+        if (user.isAccountNonLocked() && user.isEnabled()){
+            user.setOnline(true);
+            userRepo.save(user);
+        }
+
+        return user;
     }
 
     public String loadUserpic(MultipartFile file) {
@@ -179,6 +185,19 @@ public class UserService implements UserDetailsService{
 
     public List<User> findAll() {
         return userRepo.findAll();
+    }
+
+    public List<User> findActive(){
+        List<User> users = new ArrayList<>();
+
+        for (User user : userRepo.findAll()) {
+            if (!findByIndexNameSessionRepository.findByPrincipalName(user.getId()).isEmpty()){
+                users.add(user);
+            }
+
+        }
+
+        return users;
     }
 
     public User findById(String id){

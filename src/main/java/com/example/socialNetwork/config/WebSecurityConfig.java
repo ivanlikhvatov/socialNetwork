@@ -1,5 +1,8 @@
 package com.example.socialNetwork.config;
 
+import com.example.socialNetwork.component.LoggedUser;
+import com.example.socialNetwork.component.MySimpleUrlAuthenticationSuccessHandler;
+import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.dto.Role;
 import com.example.socialNetwork.domain.SocialUser;
@@ -7,6 +10,7 @@ import com.example.socialNetwork.exceptions.NotFoundException;
 import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,6 +18,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -35,6 +42,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserService userService;
 
+    @Autowired
+    MySimpleUrlAuthenticationSuccessHandler mySimpleUrlAuthenticationSuccessHandler;
+
+    @Autowired
+    LoggedUser loggedUser;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -47,7 +60,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .logout(l -> l
-                        .logoutSuccessUrl("/").permitAll()
+                        .logoutSuccessUrl("/").permitAll().addLogoutHandler((request, response, authentication) -> {
+                            System.out.println("logged out 1!");
+                            System.out.println(authentication.getPrincipal());
+                        })
                 )
                 .csrf().disable()
                 .oauth2Login(oauth2 -> oauth2
@@ -86,6 +102,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     newUser.setAuthorityType(AuthorityType.SOCIAL);
                     newUser.setActive(true);
                     newUser.setNonLocked(true);
+                    newUser.setOnline(true);
 
                     return newUser;
                 });

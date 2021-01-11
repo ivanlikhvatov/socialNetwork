@@ -93,17 +93,30 @@
 
         <v-list-item>
             <v-list-item-action>
+                <v-row>
+                    <v-btn
+                            v-if="profile.admin"
+                            outlined
+                            color="indigo"
+                            @click="edit"
+                    >
+                        <v-icon left>
+                            edit
+                        </v-icon>
+                        Редактировать профиль
+                    </v-btn>
 
-                <v-btn
-                        outlined
-                        color="indigo"
-                        @click="edit"
-                >
-                    <v-icon left>
-                        edit
-                    </v-icon>
-                    Редактировать профиль
-                </v-btn>
+                    <v-btn
+                            outlined
+                            color="success"
+                            @click="send"
+                    >
+                        <v-icon left>
+                            message
+                        </v-icon>
+                        Написать
+                    </v-btn>
+                </v-row>
             </v-list-item-action>
         </v-list-item>
 
@@ -114,19 +127,20 @@
 </template>
 
 <script>
+    import {mapState} from "vuex";
+
     export default {
         name: "UserRow.vue",
         props: ['user', 'users', 'editUser'],
 
-        computed: {
-            // authorName() {
-            //     return this.message.author ? this.message.author.name : 'unknown'
-            // }
-        },
+        computed: mapState(['profile']),
 
         methods: {
             edit() {
                 this.editUser(this.user)
+            },
+            send() {
+
             },
         }
     }

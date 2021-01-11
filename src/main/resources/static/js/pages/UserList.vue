@@ -24,7 +24,7 @@
 <script>
     import { mapState } from 'vuex'
     import { mapActions } from 'vuex'
-    import UserRow from 'components/messages/UserRow.vue'
+    import UserRow from 'components/users/UserRow.vue'
     import UserInfo from 'pages/UserInfo.vue'
 
     export default {

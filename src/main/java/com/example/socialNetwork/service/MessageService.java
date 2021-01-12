@@ -34,7 +34,9 @@ public class MessageService {
     private final GeneralMessageRepo generalMessageRepo;
     private final PrivateMessageRepo privateMessageRepo;
     private final GroupMessageRepo groupMessageRepo;
-    private final BiConsumer<EventType, Message> wsSender;
+    private final BiConsumer<EventType, Message> wsPrivateSender;
+    private final BiConsumer<EventType, Message> wsGeneralSender;
+    private final BiConsumer<EventType, Message> wsGroupSender;
 
     @Autowired
     public MessageService(MessageRepo messageRepo, GeneralMessageRepo generalMessageRepo, PrivateMessageRepo privateMessageRepo, GroupMessageRepo groupMessageRepo, WsSender wsSender) {
@@ -42,7 +44,9 @@ public class MessageService {
         this.generalMessageRepo = generalMessageRepo;
         this.privateMessageRepo = privateMessageRepo;
         this.groupMessageRepo = groupMessageRepo;
-        this.wsSender = wsSender.getSender(ObjectType.MESSAGE, Views.FullMessage.class);
+        this.wsPrivateSender = wsSender.getSender(ObjectType.PRIVATE_MESSAGE, Views.FullMessage.class);
+        this.wsGeneralSender = wsSender.getSender(ObjectType.GENERAL_MESSAGE, Views.FullMessage.class);
+        this.wsGroupSender = wsSender.getSender(ObjectType.GROUP_MESSAGE, Views.FullMessage.class);
     }
 
     private void fillMeta(Message message) throws IOException {
@@ -92,14 +96,14 @@ public class MessageService {
 
     public void delete(Message message) {
         messageRepo.delete(message);
-        wsSender.accept(EventType.REMOVE, message);
+        wsGeneralSender.accept(EventType.REMOVE, message);
     }
 
     public Message update(Message messageFromDb, Message message) throws IOException {
         messageFromDb.setText(message.getText());
         fillMeta(messageFromDb);
         Message updatedMessage = messageRepo.save(messageFromDb);
-        wsSender.accept(EventType.UPDATE, updatedMessage);
+        wsGeneralSender.accept(EventType.UPDATE, updatedMessage);
 
         return updatedMessage;
     }
@@ -111,21 +115,21 @@ public class MessageService {
         if (message.getMessageType().equals(MessageType.GENERAL)){
             GeneralMessage gm = (GeneralMessage) message;
             GeneralMessage updatedMessage = messageRepo.save(gm);
-            wsSender.accept(EventType.CREATE, updatedMessage);
+            wsGeneralSender.accept(EventType.CREATE, updatedMessage);
             return updatedMessage;
         }
 
         else if (message.getMessageType().equals(MessageType.GROUP)){
             GroupMessage groupMessage = (GroupMessage) message;
             GroupMessage updatedMessage = messageRepo.save(groupMessage);
-            wsSender.accept(EventType.CREATE, updatedMessage);
+            wsGroupSender.accept(EventType.CREATE, updatedMessage);
             return updatedMessage;
         }
 
         else if (message.getMessageType().equals(MessageType.PRIVATE)){
             PrivateMessage pm = (PrivateMessage) message;
             PrivateMessage updatedMessage = messageRepo.save(pm);
-            wsSender.accept(EventType.CREATE, updatedMessage);
+            wsPrivateSender.accept(EventType.CREATE, updatedMessage);
             return updatedMessage;
         }
 
@@ -141,14 +145,21 @@ public class MessageService {
         );
     }
 
-    public PrivateMessagePageDto findPrivateMessages(User addressee, User author, Pageable pageable) {
-        Page<PrivateMessage> page = privateMessageRepo.findAllByAddresseeAndAuthorOrAuthorAndAddressee(addressee, author, author, addressee, pageable);
-        return new PrivateMessagePageDto(
-                page.getContent(),
-                pageable.getPageNumber(),
-                page.getTotalPages()
-        );
+//    public PrivateMessagePageDto findPrivateMessages(User user, Pageable pageable) {
+////        Page<PrivateMessage> page = privateMessageRepo.findAllByAddresseeAndAuthorOrAuthorAndAddressee(addressee, author, author, addressee, pageable);
+//        Page<PrivateMessage> page = privateMessageRepo.findAllByAddresseeOrAuthor(user, user, pageable);
+//        return new PrivateMessagePageDto(
+//                page.getContent(),
+//                pageable.getPageNumber(),
+//                page.getTotalPages()
+//        );
+//    }
+
+
+    public List<PrivateMessage> findPrivateMessages(User user){
+        return privateMessageRepo.findAllByAddresseeOrAuthor(user, user);
     }
+
 
     public GroupMessagePageDto findGroupMessages(List<User> addressees, User author, Pageable pageable) {
 //        Page<GroupMessage> page = groupMessageRepo.findAllByAddresseesOrAuthor(addressees, author, pageable);

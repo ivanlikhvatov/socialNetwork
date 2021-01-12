@@ -1,7 +1,5 @@
 package com.example.socialNetwork.config;
-
-import com.example.socialNetwork.component.LoggedUser;
-import com.example.socialNetwork.component.MySimpleUrlAuthenticationSuccessHandler;
+import com.example.socialNetwork.domain.CustomUser;
 import com.example.socialNetwork.domain.User;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.dto.Role;
@@ -10,7 +8,6 @@ import com.example.socialNetwork.exceptions.NotFoundException;
 import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,9 +15,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -30,6 +24,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -41,12 +36,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    MySimpleUrlAuthenticationSuccessHandler mySimpleUrlAuthenticationSuccessHandler;
-
-    @Autowired
-    LoggedUser loggedUser;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -61,8 +50,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .logout(l -> l
                         .logoutSuccessUrl("/").permitAll().addLogoutHandler((request, response, authentication) -> {
-                            System.out.println("logged out 1!");
-                            System.out.println(authentication.getPrincipal());
+                            Optional<User> optionalUser = userRepo.findById(authentication.getName());
+
+                            if (optionalUser.isPresent()){
+                                User user = optionalUser.get();
+
+                                if (user instanceof CustomUser){
+                                    CustomUser customUser = (CustomUser) user;
+                                    customUser.setOnline(false);
+                                    customUser.setLastVisit(LocalDateTime.now());
+                                    userRepo.save(customUser);
+                                }
+
+                                if (user instanceof SocialUser){
+                                    SocialUser socialUser = (SocialUser) user;
+                                    socialUser.setOnline(false);
+                                    socialUser.setLastVisit(LocalDateTime.now());
+                                    userRepo.save(socialUser);
+                                }
+                            }
                         })
                 )
                 .csrf().disable()
@@ -102,7 +108,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     newUser.setAuthorityType(AuthorityType.SOCIAL);
                     newUser.setActive(true);
                     newUser.setNonLocked(true);
-                    newUser.setOnline(true);
 
                     return newUser;
                 });
@@ -111,6 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     throw new NotFoundException();
                 }
 
+                user.setOnline(true);
                 user.setLastVisit(LocalDateTime.now());
                 userRepo.save(user);
 

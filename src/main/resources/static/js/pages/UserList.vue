@@ -11,6 +11,7 @@
                                       :key="user.id"
                                       :users="users"
                                       :editUser="editUser"
+                                      :createDialog="createDialog"
                             >
                             </user-row>
                         </v-list>
@@ -42,6 +43,9 @@
             ...mapActions(['loadUsers']),
             editUser(user){
                 this.$router.push({name: 'userInfo', params: {user}})
+            },
+            createDialog(addressee){
+                this.$router.push({name: 'privateMessages', params: {addressee}})
             }
         },
 

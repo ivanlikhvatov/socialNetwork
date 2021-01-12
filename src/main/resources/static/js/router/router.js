@@ -19,7 +19,7 @@ const routes = [
     { path: '/registration', component: Registration },
     { path: '/loginError', component: Auth },
     { path: '/login', component: Auth },
-    { path: '/privateMessages', component: PrivateMessageList},
+    { path: '/privateMessages', component: PrivateMessageList, props: true, params: true, name: "privateMessages"},
     { path: '*', component: GeneralMessagesList },
 ];
 

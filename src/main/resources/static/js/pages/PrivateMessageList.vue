@@ -1,46 +1,114 @@
 <template>
-    <v-container>
-
-        <v-row>
-            <v-col>
+    <v-container fluid>
+        <v-layout row>
+            <v-flex xs3>
                 <v-navigation-drawer
                         absolute
                         permanent
                         id="navDrawer"
-                        width="370px"
                 >
-                    <v-list-item two-line>
-                        <v-list-item-avatar>
-                            <img src="https://randomuser.me/api/portraits/women/81.jpg">
-                        </v-list-item-avatar>
+                    <v-list two-line>
+                        <template v-for="message in getDialogsAndLastMessage">
+                            <v-list-item :key="message.id"
+                                         @click="changeDialog(message)"
+                            >
+                                <template v-slot:default="{ active }">
+                                    <v-list-item-avatar>
+                                        <v-img v-if="message.addressee.userpic != null && message.addressee.userpic.match(/http/) != null && message.addressee.id !== profile.id" :src="message.addressee.userpic"></v-img>
+                                        <v-img v-else-if="message.author.userpic != null && message.author.userpic.match(/http/) != null && message.author.id !== profile.id" :src="message.author.userpic"></v-img>
 
-                        <v-list-item-content>
-                            <v-list-item-title>Jane Smith</v-list-item-title>
-                            <v-list-item-subtitle>Logged In skf;lksd;fk;lskdf ffffffffffffffffffff</v-list-item-subtitle>
-                        </v-list-item-content>
-                    </v-list-item>
+                                        <v-img v-else-if="message.addressee.userpic != null && message.addressee.id !== profile.id" :src="'/img/'+message.addressee.userpic" max-width="240px"></v-img>
+                                        <v-img v-else-if="message.author.userpic != null && message.author.id !== profile.id" :src="'/img/'+message.author.userpic" max-width="240px"></v-img>
 
-                    <v-divider></v-divider>
+                                        <v-avatar v-else color="red">
+                                            <span v-if="message.addressee.id !== profile.id" class="white--text headline">{{message.addressee.name.toString()[0]}}</span>
+                                            <span v-else-if="message.author.id !== profile.id" class="white--text headline">{{message.author.name.toString()[0]}}</span>
+                                        </v-avatar>
+                                    </v-list-item-avatar>
 
-                    <v-list dense>
+                                    <v-list-item-content>
+                                        <v-list-item-title v-if="message.addressee.id !== profile.id">{{message.addressee.name}}</v-list-item-title>
+                                        <v-list-item-title v-else>{{message.author.name}}</v-list-item-title>
+                                        <v-list-item-subtitle v-if="message.author.id !== profile.id">{{message.text}}</v-list-item-subtitle>
+                                        <v-list-item-subtitle v-else>Вы: {{message.text}}</v-list-item-subtitle>
+                                    </v-list-item-content>
+                                </template>
+                            </v-list-item>
+
+                            <v-divider></v-divider>
+                        </template>
+                    </v-list>
+                </v-navigation-drawer>
+            </v-flex>
+
+            <v-flex xs8 order-lg2>
+                <message-form v-if="actualAddressee" :messageAttr="message" :sendMessage="sendMessage"/>
+
+                <template v-if="actualAddressee">
+                    <v-list v-for="message in getPrivateByAddressee(actualAddressee.id)"
+                            :key="message.id+'all'"
+                    >
                         <v-list-item>
-
+                            {{message.text}}
                         </v-list-item>
                     </v-list>
-
-                </v-navigation-drawer>
-            </v-col>
-
-            <v-col>
-
-            </v-col>
-        </v-row>
+                </template>
+            </v-flex>
+        </v-layout>
     </v-container>
 </template>
 
 <script>
+    import MessageRow from "components/messages/GeneralMessageRow.vue";
+    import MessageForm from "components/messages/PrivateMessageForm.vue";
+    import {mapActions, mapGetters, mapState} from "vuex";
+
     export default {
-        name: "PrivateMessageList"
+        computed: {
+            ...mapGetters(['getPrivateByAddressee', 'getDialogsAndLastMessage']),
+            ...mapState(['profile'])
+        },
+        name: "PrivateMessageList",
+        props: ['addressee'],
+        data() {
+            return {
+                message: null,
+                actualAddressee: null
+            }
+        },
+        components: {
+            MessageRow,
+            MessageForm
+        },
+
+        methods: {
+            ...mapActions(['addPrivateMessageActions']),
+            editMessage(message) {
+                this.message = message
+            },
+            sendMessage(message){
+
+                if (this.actualAddressee){
+                    message.addressee = this.actualAddressee
+                }
+
+                this.addPrivateMessageActions(message)
+
+            },
+            changeDialog(message){
+                if (message.addressee.id !== this.profile.id){
+                    this.actualAddressee = message.addressee
+                } else if (message.author.id !== this.profile.id){
+                    this.actualAddressee = message.author
+                }
+            }
+        },
+
+        created() {
+            if (this.addressee){
+                this.actualAddressee = this.addressee
+            }
+        }
     }
 </script>
 

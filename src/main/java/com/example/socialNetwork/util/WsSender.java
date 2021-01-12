@@ -48,10 +48,6 @@ public class WsSender {
                 template.convertAndSend("/topic/activity/" + addressee,
                         new WsEventDto(objectType, eventType, value)
                 );
-
-                template.convertAndSend("/topic/activity/" + author,
-                        new WsEventDto(objectType, eventType, value)
-                );
             }
 
             if (payload.getClass().equals(GeneralMessage.class)){

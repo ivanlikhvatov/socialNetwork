@@ -1,5 +1,5 @@
 package com.example.socialNetwork.dto;
 
 public enum ObjectType {
-    MESSAGE, LOCKED
+    GENERAL_MESSAGE, PRIVATE_MESSAGE, GROUP_MESSAGE, LOCKED
 }

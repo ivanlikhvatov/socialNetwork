@@ -96,7 +96,7 @@
 
         computed: mapState(['profile']),
         methods: {
-            ...mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation']),
+            ...mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation', 'addPrivateMessageMutation', 'updatePrivateMessageMutation']),
             showGeneralMessages(){
                 this.$router.push('/')
             },
@@ -121,8 +121,9 @@
 
         created() {
             addHandler(data => {
-                if (data.objectType === 'MESSAGE'){
+                if (data.objectType === 'GENERAL_MESSAGE'){
                     switch (data.eventType) {
+
                         case 'CREATE' :
                             this.addMessageMutation(data.body);
                             break;
@@ -135,7 +136,23 @@
                         default:
                             console.error('Looks like event type is unknown "${data.eventType}" ')
                     }
-                } else if (data.objectType === 'LOCKED'){
+                } else if (data.objectType === 'PRIVATE_MESSAGE'){
+                    switch (data.eventType) {
+
+                        case 'CREATE' :
+                            this.addPrivateMessageMutation(data.body);
+                            break;
+                        case 'UPDATE' :
+                            this.updatePrivateMessageMutation(data.body);
+                            break;
+                        default:
+                            console.error('Looks like event type is unknown "${data.eventType}" ')
+                    }
+                } else if (data.objectType === 'GROUP_MESSAGE'){
+
+                }
+
+                else if (data.objectType === 'LOCKED'){
                     window.location.reload()
                 } else {
                     console.error('Looks like the object type is unknown "${data.bodyType}" ')

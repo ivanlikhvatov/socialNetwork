@@ -9,13 +9,40 @@ export default new Vuex.Store({
     state: {
         profile,
         messages,
+        privateMessages,
         emails,
         infoMessage,
         users,
         ...frontendData,
     },
     getters : {
-        sortedMessages: state => (state.messages || []).sort((a, b) => -(a.id - b.id))
+        sortedMessages: state => (state.messages || []).sort((a, b) => -(a.id - b.id)),
+        sortedPrivateMessages: state => (state.privateMessages || []).sort((a, b) => -(a.id - b.id)),
+
+        getPrivateByAddressee: state => id => state.privateMessages.filter(message => message.addressee.id === id || message.author.id === id).sort((a, b) => -(a.id - b.id)),
+
+        getDialogsAndLastMessage: state => {
+            let existingInterlocutor = [];
+            let lastMessageInDialog = [];
+            // let length = state.sortedPrivateMessages().length;
+
+            for (let i = state.privateMessages.length - 1; i >= 0; i--){
+
+                if (existingInterlocutor.indexOf(state.privateMessages[i].addressee.id) === -1 && state.privateMessages[i].addressee.id !== state.profile.id){
+                    lastMessageInDialog.push(state.privateMessages[i])
+                    existingInterlocutor.push(state.privateMessages[i].addressee.id)
+                }
+
+                if (existingInterlocutor.indexOf(state.privateMessages[i].author.id) === -1 && state.privateMessages[i].author.id !== state.profile.id){
+                    lastMessageInDialog.push(state.privateMessages[i])
+                    existingInterlocutor.push(state.privateMessages[i].author.id)
+                }
+
+            }
+
+            // alert(lastMessageInDialog)
+            return lastMessageInDialog;
+        }
     },
     mutations: {
         addMessageMutation(state, message){
@@ -24,6 +51,14 @@ export default new Vuex.Store({
                 message
             ]
         },
+
+        addPrivateMessageMutation(state, message){
+            state.privateMessages = [
+                ...state.privateMessages,
+                message
+            ]
+        },
+
         updateMessageMutation(state, message){
             const updateIndex = state.messages.findIndex(item => item.id === message.id)
             state.messages = [
@@ -32,6 +67,16 @@ export default new Vuex.Store({
                 ...state.messages.slice(updateIndex + 1)
             ]
         },
+
+        updatePrivateMessageMutation(state, message){
+            const updateIndex = state.privateMessages.findIndex(item => item.id === message.id)
+            state.privateMessages = [
+                ...state.privateMessages.slice(0, updateIndex),
+                message,
+                ...state.privateMessages.slice(updateIndex + 1)
+            ]
+        },
+
         removeMessageMutation(state, message){
             const deleteIndex = state.messages.findIndex(item => item.id === message.id)
 
@@ -43,6 +88,7 @@ export default new Vuex.Store({
             }
 
         },
+
         addMessagePageMutation(state, messages) {
             const targetMessages = state.messages
                 .concat(messages)
@@ -90,6 +136,20 @@ export default new Vuex.Store({
                 commit('removeMessageMutation', message)
             }
         },
+
+        async addPrivateMessageActions({commit, state}, message){
+            const result = await messagesApi.addPrivate(message)
+            const data = await result.json()
+            const index = state.privateMessages.findIndex(item => item.id === data.id);
+
+
+            if (index > -1) {
+                commit('updatePrivateMessageMutation', data)
+            } else {
+                commit('addPrivateMessageMutation', data)
+            }
+        },
+
         async loadGeneralPageAction({commit, state}) {
             const response = await messagesApi.generalMessagePage(state.currentPage + 1)
             const data = await response.json()
@@ -99,14 +159,10 @@ export default new Vuex.Store({
             commit('updateCurrentPageMutation', Math.min(data.currentPage, data.totalPages - 1))
         },
 
-        async loadPrivatePageAction({commit, state}) {
-            const response = await messagesApi.privateMessagePage(state.currentPage + 1)
-            const data = await response.json()
-
-            commit('addMessagePageMutation', data.messages)
-            commit('updateTotalPagesMutation', data.totalPages)
-            commit('updateCurrentPageMutation', Math.min(data.currentPage, data.totalPages - 1))
-        },
+        // async loadPrivatePageAction({commit, state}) {
+        //     const response = await messagesApi.privateMessagePage()
+        //     const data = await response.json()
+        // },
 
         async loadUsers({commit, state}) {
             const response = await usersApi.list()

@@ -43,12 +43,10 @@ public class MessageController {
 
     @GetMapping("/private")
     @JsonView(Views.FullMessage.class)
-    public PrivateMessagePageDto privateList(
-            @PageableDefault(size = MESSAGES_PER_PAGE, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
-            @AuthenticationPrincipal User author,
-            User addressee
+    public List<PrivateMessage> privateList(
+            @AuthenticationPrincipal User user
     ){
-        return messageService.findPrivateMessages(addressee, author, pageable);
+        return messageService.findPrivateMessages(user);
     }
 
     @GetMapping("/group")
@@ -67,54 +65,41 @@ public class MessageController {
         return message;
     }
 
-    @PostMapping("{type}")
+    @PostMapping("GENERAL")
     @JsonView(Views.FullMessage.class)
-    public Message create(@RequestBody Message message,
-                          @AuthenticationPrincipal User user,
-                          @PathVariable("type") MessageType type
+    public Message create(@RequestBody GeneralMessage message,
+                          @AuthenticationPrincipal User user
     ) throws IOException {
-        User userDb = userService.findById(user.getId());
+        message.setAuthor(user);
+        message.setMessageType(MessageType.GENERAL);
 
-        if (!userDb.isAccountNonLocked()){
-            GeneralMessage errMessage = new GeneralMessage();
-            User errUser = userService.findById("bot");
+        return messageService.create(message);
+    }
 
-            errMessage.setCreationDate(LocalDateTime.now());
-            errMessage.setText(user.getName() + ", Ваш аккаунт был заблокирован из-за нарушения правил нашего чата, вы можете написать администратору, либо связаться с нами по почте");
-            errMessage.setMessageType(type);
-            errMessage.setAuthor(errUser);
+    @PostMapping("PRIVATE")
+    @JsonView(Views.FullMessage.class)
+    public Message create(@RequestBody PrivateMessage message,
+                          @AuthenticationPrincipal User user
+    ) throws IOException {
+        message.setAuthor(user);
+        System.out.println("Адресат" + message.getAddressee().getName());
+        System.out.println("Отправитель" + message.getAuthor().getName());
+        System.out.println("Отправитель" + user.getName());
+        message.setMessageType(MessageType.PRIVATE);
 
-            return messageService.create(errMessage);
-        }
+        return messageService.create(message);
+    }
 
-        if (MessageType.GENERAL.equals(type)){
-            GeneralMessage gm = new GeneralMessage();
-            gm.setText(message.getText());
-            gm.setAuthor(user);
-            gm.setMessageType(type);
+    @PostMapping("GROUP")
+    @JsonView(Views.FullMessage.class)
+    public Message create(@RequestBody GroupMessage message,
+                          @AuthenticationPrincipal User user
+    ) throws IOException {
+        message.setAuthor(user);
+        message.setMessageType(MessageType.GROUP);
 
-            return messageService.create(gm);
-        }
+        return messageService.create(message);
 
-        if (MessageType.PRIVATE.equals(type)){
-            PrivateMessage pm = new PrivateMessage();
-            pm.setText(message.getText());
-            pm.setAuthor(user);
-            pm.setMessageType(type);
-
-            return messageService.create(pm);
-        }
-
-        if (MessageType.GROUP.equals(type)){
-            GroupMessage gm = new GroupMessage();
-            gm.setText(message.getText());
-            gm.setAuthor(user);
-            gm.setMessageType(type);
-
-            return messageService.create(gm);
-        }
-
-        return null;
     }
 
     @PutMapping("{id}")

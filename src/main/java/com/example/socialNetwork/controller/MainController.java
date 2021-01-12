@@ -3,6 +3,7 @@ package com.example.socialNetwork.controller;
 import com.example.socialNetwork.domain.*;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.dto.GeneralMessagePageDto;
+import com.example.socialNetwork.dto.PrivateMessagePageDto;
 import com.example.socialNetwork.repo.UserRepo;
 import com.example.socialNetwork.service.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,11 +68,21 @@ public class MainController {
 
             String messages = messageWriter.writeValueAsString(generalMessagePageDto.getMessages());
 
+
+
+            List<PrivateMessage> privateMessageList = messageService.findPrivateMessages(user);
+            System.out.println("main");
+
+            String privateMessages = messageWriter.writeValueAsString(privateMessageList);
+
+
             model.addAttribute("messages", messages);
+            model.addAttribute("privateMessages", privateMessages);
             data.put("currentPage", generalMessagePageDto.getCurrentPage());
             data.put("totalPages", generalMessagePageDto.getTotalPages());
         } else {
             model.addAttribute("messages", "[]");
+            model.addAttribute("privateMessages", "[]");
             model.addAttribute("profile", "null");
         }
 

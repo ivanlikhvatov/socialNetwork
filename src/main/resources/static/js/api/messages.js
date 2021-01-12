@@ -9,6 +9,6 @@ export default {
     update: message => messages.update({id: message.id}, message),
     remove: id => messages.remove({id}),
     generalMessagePage: page => Vue.http.get('/message/general', {params: { page }}),
-    privateMessagePage: page => Vue.http.get('/message/private', {params: { page }}),
+    privateMessagePage: privateMessagePage => Vue.http.get('/message/private'),
     groupMessagePage: page => Vue.http.get('/message/group', {params: { page }})
 }

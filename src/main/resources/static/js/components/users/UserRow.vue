@@ -107,9 +107,10 @@
                     </v-btn>
 
                     <v-btn
+                            v-if="profile.id !== user.id"
                             outlined
                             color="success"
-                            @click="send"
+                            @click="create"
                     >
                         <v-icon left>
                             message
@@ -131,7 +132,7 @@
 
     export default {
         name: "UserRow.vue",
-        props: ['user', 'users', 'editUser'],
+        props: ['user', 'users', 'editUser', 'createDialog'],
 
         computed: mapState(['profile']),
 
@@ -139,8 +140,8 @@
             edit() {
                 this.editUser(this.user)
             },
-            send() {
-
+            create() {
+                this.createDialog(this.user)
             },
         }
     }

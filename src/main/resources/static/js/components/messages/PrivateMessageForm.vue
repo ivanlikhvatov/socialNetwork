@@ -1,7 +1,7 @@
 <template>
     <v-layout align-center>
         <v-text-field
-                label="Write Something"
+                label="Введите сообщение"
                 v-model="text"
                 @keyup.enter="send"
         />

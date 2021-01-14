@@ -33,6 +33,9 @@ public class Message {
     private User author;
 
     @JsonView(Views.FullMessage.class)
+    private String filename;
+
+    @JsonView(Views.FullMessage.class)
     private String link;
     @JsonView(Views.FullMessage.class)
     private String linkTitle;

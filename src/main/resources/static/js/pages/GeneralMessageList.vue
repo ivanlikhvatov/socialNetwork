@@ -8,16 +8,11 @@
                 <v-flex>
                     <v-card>
                         <v-list three-line>
-                            <v-list-item-group
-                                    active-class="grey-text"
-                                    multiple
-                            >
                             <message-row v-for="message in sortedMessages"
                                          :key="message.id"
                                          :message="message"
                                          :editMessage="editMessage"/>
                                 <general-lazy-loader></general-lazy-loader>
-                            </v-list-item-group>
                         </v-list>
                     </v-card>
                 </v-flex>

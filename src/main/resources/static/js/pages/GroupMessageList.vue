@@ -97,7 +97,8 @@
                                 <template v-slot:default="{ active }">
                                     <v-list-item-content>
                                         <v-list-item-title>{{groupWithLastMessage.group.name}}</v-list-item-title>
-                                        <v-list-item-subtitle v-if="groupWithLastMessage.lastMessage">{{groupWithLastMessage.lastMessage.text}}</v-list-item-subtitle>
+                                        <v-list-item-subtitle v-if="groupWithLastMessage.lastMessage && groupWithLastMessage.lastMessage.author.id === profile.id">Вы: {{groupWithLastMessage.lastMessage.text}}</v-list-item-subtitle>
+                                        <v-list-item-subtitle v-else-if="groupWithLastMessage.lastMessage && groupWithLastMessage.lastMessage.author.id !== profile.id">{{groupWithLastMessage.lastMessage.text}}</v-list-item-subtitle>
                                         <v-list-item-subtitle v-else>Сообщений нет</v-list-item-subtitle>
                                     </v-list-item-content>
                                 </template>
@@ -115,10 +116,38 @@
                 <template v-if="actualGroup">
                     <v-list v-for="groupMessage in getGroupByGroup(actualGroup.id)"
                             :key="groupMessage.id"
+                            rounded
                     >
-                        <v-list-item>
-                            {{groupMessage.text}}
-                        </v-list-item>
+<!--                        <v-list-item-group-->
+<!--                                v-model="selectMessages"-->
+<!--                                color="primary"-->
+<!--                        >-->
+                            <v-list-item>
+                                <v-list-item-avatar>
+                                    <v-img v-if="groupMessage.author.userpic != null && groupMessage.author.userpic.match(/http/) != null" :src="groupMessage.author.userpic"></v-img>
+                                    <v-img v-else-if="groupMessage.author.userpic != null" :src="'/img/'+groupMessage.author.userpic" max-width="240px"></v-img>
+                                    <v-avatar v-else color="red">
+                                        <span class="white--text headline">{{groupMessage.author.name.toString()[0]}}</span>
+                                    </v-avatar>
+                                </v-list-item-avatar>
+
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{groupMessage.text}}
+                                    </v-list-item-title>
+
+                                    <v-list-item-subtitle>
+                                        <media v-if="groupMessage.link" :message="message"></media>
+                                    </v-list-item-subtitle>
+
+                                    <v-list-item-subtitle>
+                                        {{new Date(groupMessage.creationDate.replace(/\s/, 'T')).getHours()}}:{{new Date(groupMessage.creationDate.replace(/\s/, 'T')).getMinutes()}}
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+
+                            </v-list-item>
+<!--                        </v-list-item-group>-->
+
                     </v-list>
                 </template>
             </v-flex>
@@ -127,10 +156,10 @@
 </template>
 
 <script>
-    // import MessageRow from "components/messages/GeneralMessageRow.vue";
     import MessageForm from "components/messages/GroupMessageForm.vue";
     import {mapActions, mapGetters, mapState} from "vuex";
     import users from "../api/users";
+    import Media from "components/media/Media.vue";
 
     export default {
         computed: {
@@ -147,6 +176,7 @@
                 selected: [],
                 selectedMembers: [],
                 newGroupName: '',
+                selectMessages: [],
                 rules: [
                     value => !!value || 'Required.',
                     value => (value || '').length <= 20 || 'Max 20 characters'
@@ -154,7 +184,7 @@
             }
         },
         components: {
-            // MessageRow,
+            Media,
             MessageForm
         },
 
@@ -172,7 +202,7 @@
 
             },
             changeGroup(group){
-                this.actualGroup = group
+                this.actualGroup = group;
             },
             getUsers(){
                 this.loadUsers()
@@ -201,7 +231,7 @@
                 } else {
                     this.selectedMembers.push(userId)
                 }
-            }
+            },
         },
     }
 </script>

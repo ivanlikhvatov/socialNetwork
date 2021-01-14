@@ -22,11 +22,11 @@
                     {{new Date(message.creationDate.replace(/\s/, 'T')).getHours()}}:{{new Date(message.creationDate.replace(/\s/, 'T')).getMinutes()}}
                 </v-list-item-action-text>
                 <div>
-                    <v-btn icon @click="edit">
+                    <v-btn icon @click="edit" v-if="message.author.id === profile.id">
                         <v-icon>edit</v-icon>
                     </v-btn>
 
-                    <v-btn icon @click="del">
+                    <v-btn icon @click="del" v-if="message.author.id === profile.id">
                         <v-icon>delete_forever</v-icon>
                     </v-btn>
                 </div>
@@ -38,13 +38,14 @@
 </template>
 
 <script>
-    import {mapActions} from 'vuex'
+    import {mapActions, mapState} from 'vuex'
     import Media from "components/media/Media.vue";
 
     export default {
         props: ['message', 'editMessage'],
         components: { Media },
         computed: {
+            ...mapState(['profile']),
             authorName() {
                 return this.message.author ? this.message.author.name : 'unknown'
             }

@@ -91,7 +91,6 @@ public class MessageController {
         message.setMessageType(MessageType.GROUP);
 
         return messageService.create(message);
-
     }
 
     @PutMapping("{id}")
@@ -102,7 +101,7 @@ public class MessageController {
             @AuthenticationPrincipal User user
     ) throws IOException {
         User userDb = userService.findById(user.getId());
-        message.setMessageType(MessageType.GENERAL);//TODO переделать
+        message.setMessageType(MessageType.GENERAL);
 
         if (!userDb.isAccountNonLocked()){
             Message errMessage = new Message();

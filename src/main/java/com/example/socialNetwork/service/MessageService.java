@@ -147,17 +147,6 @@ public class MessageService {
         );
     }
 
-//    public PrivateMessagePageDto findPrivateMessages(User user, Pageable pageable) {
-////        Page<PrivateMessage> page = privateMessageRepo.findAllByAddresseeAndAuthorOrAuthorAndAddressee(addressee, author, author, addressee, pageable);
-//        Page<PrivateMessage> page = privateMessageRepo.findAllByAddresseeOrAuthor(user, user, pageable);
-//        return new PrivateMessagePageDto(
-//                page.getContent(),
-//                pageable.getPageNumber(),
-//                page.getTotalPages()
-//        );
-//    }
-
-
     public List<PrivateMessage> findPrivateMessages(User user){
         return privateMessageRepo.findAllByAddresseeOrAuthor(user, user);
     }

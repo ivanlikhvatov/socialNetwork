@@ -173,10 +173,10 @@
                     switch (data.eventType) {
 
                         case 'CREATE' :
-                            this.addGeneralMessageMutation(data.body);
+                            this.addGroupMessageMutation(data.body);
                             break;
                         case 'UPDATE' :
-                            this.updateGeneralMessageMutation(data.body);
+                            this.updateGroupMessageMutation(data.body);
                             break;
                         default:
                             console.error('Looks like event type is unknown "${data.eventType}" ')

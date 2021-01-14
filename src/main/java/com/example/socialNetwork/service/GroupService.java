@@ -44,15 +44,17 @@ public class GroupService {
         return result;
     }
 
-    public void addMessage(GroupMessage groupMessage) {
-        Group group = groupMessage.getGroup();
-
-        List<Long> temp = group.getMessages();
-        temp.add(groupMessage.getId());
-
-        group.setMessages(temp);
-        groupRepo.save(group);
-
-        wsSender.accept(EventType.UPDATE, group);
-    }
+//    public Group addMessage(GroupMessage groupMessage) {
+//        Group group = groupMessage.getGroup();
+//
+//        List<Long> temp = group.getMessages();
+//        temp.add(groupMessage.getId());
+//
+//        group.setMessages(temp);
+//        groupRepo.save(group);
+//
+//        wsSender.accept(EventType.UPDATE, group);
+//
+//        return group;
+//    }
 }

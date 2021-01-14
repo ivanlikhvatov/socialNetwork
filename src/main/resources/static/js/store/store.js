@@ -21,6 +21,7 @@ export default new Vuex.Store({
     getters : {
         sortedMessages: state => (state.messages || []).sort((a, b) => -(a.id - b.id)),
         getPrivateByAddressee: state => id => state.privateMessages.filter(message => message.addressee.id === id || message.author.id === id).sort((a, b) => -(a.id - b.id)),
+        getGroupByGroup: state => id => state.groupMessages.filter(message => message.group.id === id).sort((a, b) => -(a.id - b.id)),
         getDialogsAndLastMessage: state => {
             let existingInterlocutor = [];
             let lastMessageInDialog = [];
@@ -41,10 +42,47 @@ export default new Vuex.Store({
             return lastMessageInDialog;
         },
         sortedGroupsWithLastMessage: state => {
-            for (let i = state.groups.length - 1; i >= 0; i--){
+            let groupsAndLastMessage = [];
 
+            for (let i = state.groups.length - 1; i >= 0; i--){
+                let groupAndLastMessage = {
+                    group: null,
+                    lastMessage: null
+                };
+
+                let temp = state.groupMessages;
+
+                for (let k = 0; k < temp.length; k++){
+                    if (temp[k].group.id === state.groups[i].id){
+                        groupAndLastMessage.lastMessage = temp[k]
+                    }
+                }
+
+                groupAndLastMessage.group = state.groups[i];
+
+                groupsAndLastMessage.push(groupAndLastMessage)
             }
-        }
+
+            return groupsAndLastMessage.sort(function(a, b){
+                let dateA, dateB;
+
+                if (a.lastMessage !== null){
+                    dateA=new Date(a.lastMessage.creationDate.replace(/\s/, 'T'))
+                } else {
+                    dateA=new Date(a.group.creationDate.replace(/\s/, 'T'))
+                }
+
+                if (b.lastMessage !== null){
+                    dateB=new Date(b.lastMessage.creationDate.replace(/\s/, 'T'))
+                } else {
+                    dateB=new Date(b.group.creationDate.replace(/\s/, 'T'))
+                }
+
+
+
+                return -(dateA-dateB) //сортировка по возрастающей дате
+            })
+        },
     },
     mutations: {
         addMessageMutation(state, message){
@@ -208,12 +246,12 @@ export default new Vuex.Store({
             }
         },
 
-        async updateGroupActions({commit}, group){
-            const result = await groupsApi.update(group)
-            const data = await result.json()
-
-            commit('updateGroupMutation', data)
-        },
+        // async updateGroupActions({commit}, message){
+        //     const result = await groupsApi.update(message)
+        //     const data = await result.json()
+        //
+        //     commit('updateGroupMutation', data)
+        // },
 
         async loadGeneralPageAction({commit, state}) {
             const response = await messagesApi.generalMessagePage(state.currentPage + 1)

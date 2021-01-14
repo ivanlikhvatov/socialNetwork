@@ -1,9 +1,7 @@
 package com.example.socialNetwork.controller;
 
-import com.example.socialNetwork.domain.Group;
-import com.example.socialNetwork.domain.Message;
-import com.example.socialNetwork.domain.User;
-import com.example.socialNetwork.domain.Views;
+import com.example.socialNetwork.domain.*;
+import com.example.socialNetwork.dto.MessageType;
 import com.example.socialNetwork.service.GroupService;
 import com.example.socialNetwork.service.MessageService;
 import com.example.socialNetwork.service.UserService;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -41,9 +40,16 @@ public class GroupController {
         List <String> temp = group.getMembers();
         temp.add(groupAdmin.getId());
         group.setMembers(temp);
+        group.setCreationDate(LocalDateTime.now());
         groupService.createGroup(group);
         return group;
     }
+
+//    @PutMapping("addMessage")
+//    @JsonView(Views.FullGroup.class)
+//    public Group update(@RequestBody GroupMessage groupMessage) throws IOException {
+//        return groupService.addMessage(groupMessage);
+//    }
 
     @GetMapping("{id}")
     @JsonView(Views.FullGroup.class)

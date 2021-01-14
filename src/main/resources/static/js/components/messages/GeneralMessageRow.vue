@@ -19,7 +19,7 @@
 
             <v-list-item-action>
                 <v-list-item-action-text>
-                    {{new Date(message.creationDate).getHours()}}:{{new Date(message.creationDate).getMinutes()}}
+                    {{new Date(message.creationDate.replace(/\s/, 'T')).getHours()}}:{{new Date(message.creationDate.replace(/\s/, 'T')).getMinutes()}}
                 </v-list-item-action-text>
                 <div>
                     <v-btn icon @click="edit">

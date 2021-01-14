@@ -4,5 +4,5 @@ const groups = Vue.resource('/group{/id}')
 
 export default {
     create: group => groups.save({}, group),
-    update: group => groups.update({id: group.id}, group)
+    // update: message => groups.update({id: 'addMessage'}, message)
 }

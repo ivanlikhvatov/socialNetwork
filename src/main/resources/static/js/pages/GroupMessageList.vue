@@ -90,14 +90,15 @@
                     </v-dialog>
 
                     <v-list two-line>
-                        <template v-for="group in groups">
-                            <v-list-item :key="groups.id"
-                                         @click="changeGroup(group)"
+                        <template v-for="groupWithLastMessage in sortedGroupsWithLastMessage">
+                            <v-list-item :key="groupWithLastMessage.group.id"
+                                         @click="changeGroup(groupWithLastMessage.group)"
                             >
                                 <template v-slot:default="{ active }">
                                     <v-list-item-content>
-                                        <v-list-item-title>{{group.name}}</v-list-item-title>
-<!--                                        <v-list-item-subtitle>{{message.text}}</v-list-item-subtitle>-->
+                                        <v-list-item-title>{{groupWithLastMessage.group.name}}</v-list-item-title>
+                                        <v-list-item-subtitle v-if="groupWithLastMessage.lastMessage">{{groupWithLastMessage.lastMessage.text}}</v-list-item-subtitle>
+                                        <v-list-item-subtitle v-else>Сообщений нет</v-list-item-subtitle>
                                     </v-list-item-content>
                                 </template>
                             </v-list-item>
@@ -111,15 +112,15 @@
             <v-flex xs8 order-lg2>
                 <message-form v-if="actualGroup" :messageAttr="message" :sendMessage="sendMessage"/>
 
-<!--                <template v-if="actualAddressee">-->
-<!--                    <v-list v-for="message in getPrivateByAddressee(actualAddressee.id)"-->
-<!--                            :key="message.id+'all'"-->
-<!--                    >-->
-<!--                        <v-list-item>-->
-<!--                            {{message.text}}-->
-<!--                        </v-list-item>-->
-<!--                    </v-list>-->
-<!--                </template>-->
+                <template v-if="actualGroup">
+                    <v-list v-for="groupMessage in getGroupByGroup(actualGroup.id)"
+                            :key="groupMessage.id"
+                    >
+                        <v-list-item>
+                            {{groupMessage.text}}
+                        </v-list-item>
+                    </v-list>
+                </template>
             </v-flex>
         </v-layout>
     </v-container>
@@ -134,7 +135,7 @@
     export default {
         computed: {
             ...mapState(['profile', 'users']),
-            ...mapGetters([])
+            ...mapGetters(['sortedGroupsWithLastMessage', 'getGroupByGroup'])
         },
         name: "GroupMessageList",
         // props: ['addressee'],
@@ -159,24 +160,19 @@
 
         methods: {
             ...mapActions(['addGroupMessageActions', 'loadUsers', 'addGroupActions']),
-            // editMessage(message) {
-            //     this.message = message
-            // },
+
             sendMessage(message){
 
                 if (this.actualGroup){
                     message.group = this.actualGroup
+
+                    this.addGroupMessageActions(message)
                 }
 
-                this.addGroupMessageActions(message)
 
             },
-            changeGroup(message){
-                // if (message.addressee.id !== this.profile.id){
-                //     this.actualAddressee = message.addressee
-                // } else if (message.author.id !== this.profile.id){
-                //     this.actualAddressee = message.author
-                // }
+            changeGroup(group){
+                this.actualGroup = group
             },
             getUsers(){
                 this.loadUsers()

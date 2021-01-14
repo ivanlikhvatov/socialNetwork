@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import messagesApi from "../api/messages";
 import usersApi from "../api/users";
+import groupsApi from "../api/groups";
 
 Vue.use(Vuex);
 
@@ -10,6 +11,8 @@ export default new Vuex.Store({
         profile,
         messages,
         privateMessages,
+        groupMessages,
+        groups,
         emails,
         infoMessage,
         users,
@@ -17,17 +20,12 @@ export default new Vuex.Store({
     },
     getters : {
         sortedMessages: state => (state.messages || []).sort((a, b) => -(a.id - b.id)),
-        sortedPrivateMessages: state => (state.privateMessages || []).sort((a, b) => -(a.id - b.id)),
-
         getPrivateByAddressee: state => id => state.privateMessages.filter(message => message.addressee.id === id || message.author.id === id).sort((a, b) => -(a.id - b.id)),
-
         getDialogsAndLastMessage: state => {
             let existingInterlocutor = [];
             let lastMessageInDialog = [];
-            // let length = state.sortedPrivateMessages().length;
 
             for (let i = state.privateMessages.length - 1; i >= 0; i--){
-
                 if (existingInterlocutor.indexOf(state.privateMessages[i].addressee.id) === -1 && state.privateMessages[i].addressee.id !== state.profile.id){
                     lastMessageInDialog.push(state.privateMessages[i])
                     existingInterlocutor.push(state.privateMessages[i].addressee.id)
@@ -40,8 +38,12 @@ export default new Vuex.Store({
 
             }
 
-            // alert(lastMessageInDialog)
             return lastMessageInDialog;
+        },
+        sortedGroupsWithLastMessage: state => {
+            for (let i = state.groups.length - 1; i >= 0; i--){
+
+            }
         }
     },
     mutations: {
@@ -56,6 +58,20 @@ export default new Vuex.Store({
             state.privateMessages = [
                 ...state.privateMessages,
                 message
+            ]
+        },
+
+        addGroupMessageMutation(state, message){
+            state.groupMessages = [
+                ...state.groupMessages,
+                message
+            ]
+        },
+
+        addGroupMutation(state, group){
+            state.groups = [
+                ...state.groups,
+                group
             ]
         },
 
@@ -74,6 +90,24 @@ export default new Vuex.Store({
                 ...state.privateMessages.slice(0, updateIndex),
                 message,
                 ...state.privateMessages.slice(updateIndex + 1)
+            ]
+        },
+
+        updateGroupMessageMutation(state, message){
+            const updateIndex = state.groupMessages.findIndex(item => item.id === message.id)
+            state.groupMessages = [
+                ...state.groupMessages.slice(0, updateIndex),
+                message,
+                ...state.groupMessages.slice(updateIndex + 1)
+            ]
+        },
+
+        updateGroupMutation(state, group){
+            const updateIndex = state.groups.findIndex(item => item.id === group.id)
+            state.groups = [
+                ...state.groups.slice(0, updateIndex),
+                group,
+                ...state.groups.slice(updateIndex + 1)
             ]
         },
 
@@ -116,20 +150,20 @@ export default new Vuex.Store({
             const data = await result.json()
             const index = state.messages.findIndex(item => item.id === data.id);
 
-
             if (index > -1) {
                 commit('updateMessageMutation', data)
             } else {
                 commit('addMessageMutation', data)
             }
         },
+
         async updateMessageActions({commit}, message){
             const result = await messagesApi.update(message)
-            console.log(result)
             const data = await result.json()
 
             commit('updateMessageMutation', data)
         },
+
         async removeMessageActions({commit}, message){
             const result = await messagesApi.remove(message.id)
             if (result.ok) {
@@ -142,12 +176,43 @@ export default new Vuex.Store({
             const data = await result.json()
             const index = state.privateMessages.findIndex(item => item.id === data.id);
 
-
             if (index > -1) {
                 commit('updatePrivateMessageMutation', data)
             } else {
                 commit('addPrivateMessageMutation', data)
             }
+        },
+
+        async addGroupMessageActions({commit, state}, message){
+            const result = await messagesApi.addGroup(message)
+            const data = await result.json()
+            const index = state.groupMessages.findIndex(item => item.id === data.id);
+
+            if (index > -1) {
+                commit('updateGroupMessageMutation', data)
+            } else {
+                commit('addGroupMessageMutation', data)
+            }
+        },
+
+        async addGroupActions({commit, state}, group){
+            const result = await groupsApi.create(group)
+            const data = await result.json()
+            const index = state.groups.findIndex(item => item.id === data.id);
+
+
+            if (index > -1) {
+                commit('updateGroupMutation', data)
+            } else {
+                commit('addGroupMutation', data)
+            }
+        },
+
+        async updateGroupActions({commit}, group){
+            const result = await groupsApi.update(group)
+            const data = await result.json()
+
+            commit('updateGroupMutation', data)
         },
 
         async loadGeneralPageAction({commit, state}) {
@@ -158,11 +223,6 @@ export default new Vuex.Store({
             commit('updateTotalPagesMutation', data.totalPages)
             commit('updateCurrentPageMutation', Math.min(data.currentPage, data.totalPages - 1))
         },
-
-        // async loadPrivatePageAction({commit, state}) {
-        //     const response = await messagesApi.privateMessagePage()
-        //     const data = await response.json()
-        // },
 
         async loadUsers({commit, state}) {
             const response = await usersApi.list()

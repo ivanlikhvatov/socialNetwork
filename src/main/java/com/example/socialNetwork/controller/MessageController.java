@@ -2,9 +2,7 @@ package com.example.socialNetwork.controller;
 
 import com.example.socialNetwork.domain.*;
 import com.example.socialNetwork.dto.GeneralMessagePageDto;
-import com.example.socialNetwork.dto.GroupMessagePageDto;
 import com.example.socialNetwork.dto.MessageType;
-import com.example.socialNetwork.dto.PrivateMessagePageDto;
 import com.example.socialNetwork.service.MessageService;
 import com.example.socialNetwork.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -32,16 +30,15 @@ public class MessageController {
         this.userService = userService;
     }
 
-    @GetMapping("/general")
+    @GetMapping("/generalMessage")
     @JsonView(Views.FullMessage.class)
     public GeneralMessagePageDto generalList(
             @PageableDefault(size = MESSAGES_PER_PAGE, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
     ){
-        System.out.println("message");
         return messageService.findGeneralMessages(pageable);
     }
 
-    @GetMapping("/private")
+    @GetMapping("/privateMessage")
     @JsonView(Views.FullMessage.class)
     public List<PrivateMessage> privateList(
             @AuthenticationPrincipal User user
@@ -49,14 +46,12 @@ public class MessageController {
         return messageService.findPrivateMessages(user);
     }
 
-    @GetMapping("/group")
+    @GetMapping("/groupMessage")
     @JsonView(Views.FullMessage.class)
-    public GroupMessagePageDto groupList(
-            @PageableDefault(size = MESSAGES_PER_PAGE, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
-            @AuthenticationPrincipal User author,
-            List<User> addresses
+    public List<GroupMessage> groupList(
+            @AuthenticationPrincipal User user
     ){
-        return messageService.findGroupMessages(addresses, author, pageable);
+        return messageService.findGroupMessages(user);
     }
 
     @GetMapping("{id}")
@@ -82,9 +77,6 @@ public class MessageController {
                           @AuthenticationPrincipal User user
     ) throws IOException {
         message.setAuthor(user);
-        System.out.println("Адресат" + message.getAddressee().getName());
-        System.out.println("Отправитель" + message.getAuthor().getName());
-        System.out.println("Отправитель" + user.getName());
         message.setMessageType(MessageType.PRIVATE);
 
         return messageService.create(message);

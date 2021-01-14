@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from "vue-router";
 import GeneralMessagesList from 'pages/GeneralMessageList.vue'
 import PrivateMessageList from "pages/PrivateMessageList.vue";
+import GroupMessageList from "pages/GroupMessageList.vue";
 import Auth from "pages/Auth.vue";
 import Profile from "pages/Profile.vue";
 import Registration from "pages/Registration.vue";
@@ -20,6 +21,7 @@ const routes = [
     { path: '/loginError', component: Auth },
     { path: '/login', component: Auth },
     { path: '/privateMessages', component: PrivateMessageList, props: true, params: true, name: "privateMessages"},
+    { path: '/groupMessages', component: GroupMessageList},
     { path: '*', component: GeneralMessagesList },
 ];
 

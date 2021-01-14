@@ -10,4 +10,6 @@ public final class Views {
     public interface FullMessage extends IdName, FullProfile{}
 
     public interface SecureProfile extends FullProfile {}
+
+    public interface FullGroup extends IdName, FullMessage{}
 }

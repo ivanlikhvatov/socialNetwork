@@ -2,6 +2,8 @@ package com.example.socialNetwork.util;
 
 
 import com.example.socialNetwork.domain.GeneralMessage;
+import com.example.socialNetwork.domain.Group;
+import com.example.socialNetwork.domain.GroupMessage;
 import com.example.socialNetwork.domain.PrivateMessage;
 import com.example.socialNetwork.dto.EventType;
 import com.example.socialNetwork.dto.ObjectType;
@@ -37,13 +39,13 @@ public class WsSender {
                 throw new RuntimeException();
             }
 
-
             if (payload.getClass().equals(PrivateMessage.class)){
                 PrivateMessage privateMessage = (PrivateMessage) payload;
-
                 String addressee = privateMessage.getAddressee().getId();
                 String author = privateMessage.getAuthor().getId();
-
+                template.convertAndSend("/topic/activity/" + author,
+                        new WsEventDto(objectType, eventType, value)
+                );
 
                 template.convertAndSend("/topic/activity/" + addressee,
                         new WsEventDto(objectType, eventType, value)
@@ -54,6 +56,28 @@ public class WsSender {
                 template.convertAndSend("/topic/activity",
                         new WsEventDto(objectType, eventType, value)
                 );
+            }
+
+            if (payload.getClass().equals(GroupMessage.class)){
+                GroupMessage groupMessage = (GroupMessage) payload;
+
+                for (String id : groupMessage.getGroup().getMembers()) {
+                    if (!id.equals(groupMessage.getAuthor().getId())){
+                        template.convertAndSend("/topic/activity/" + id,
+                                new WsEventDto(objectType, eventType, value)
+                        );
+                    }
+
+                }
+            }
+
+            if (payload.getClass().equals(Group.class)){
+                Group group = (Group) payload;
+                for (String id : group.getMembers()) {
+                    template.convertAndSend("/topic/activity/" + id,
+                            new WsEventDto(objectType, eventType, value)
+                    );
+                }
             }
 
             if (payload.getClass().equals(String.class)){

@@ -12,8 +12,8 @@ import java.util.List;
 @Table(name = "group_message")
 @Data
 public class GroupMessage extends Message {
+    @ManyToOne
+    @JoinColumn(name = "group_id")
     @JsonView(Views.FullMessage.class)
-    @ElementCollection
-    @CollectionTable(name = "addressees")
-    private List<String> addressees;
+    private Group group;
 }

@@ -3,8 +3,8 @@ package com.example.socialNetwork.controller;
 import com.example.socialNetwork.domain.*;
 import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.dto.GeneralMessagePageDto;
-import com.example.socialNetwork.dto.PrivateMessagePageDto;
 import com.example.socialNetwork.repo.UserRepo;
+import com.example.socialNetwork.service.GroupService;
 import com.example.socialNetwork.service.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,15 +24,18 @@ import java.util.*;
 @RequestMapping("/")
 public class MainController {
     private final MessageService messageService;
+    private final GroupService groupService;
     private final UserRepo userRepo;
 
     @Value("${spring.profiles.active}")
     private String profile;
     private final ObjectWriter messageWriter;
     private final ObjectWriter userWriter;
+    private final ObjectWriter groupWriter;
 
     @Autowired
-    public MainController(MessageService messageService, UserRepo userRepo, ObjectMapper mapper) {
+    public MainController(MessageService messageService, GroupService groupService, UserRepo userRepo, ObjectMapper mapper) {
+        this.groupService = groupService;
         this.userRepo = userRepo;
         this.messageService = messageService;
         this.messageWriter = mapper
@@ -41,6 +44,9 @@ public class MainController {
         this.userWriter = mapper
                 .setConfig(mapper.getSerializationConfig())
                 .writerWithView(Views.FullProfile.class);
+        this.groupWriter = mapper
+                .setConfig(mapper.getSerializationConfig())
+                .writerWithView(Views.FullGroup.class);
     }
 
 
@@ -64,24 +70,27 @@ public class MainController {
             Sort sort = Sort.by(Sort.Direction.DESC, "id");
             PageRequest pageRequest = PageRequest.of(0, MessageController.MESSAGES_PER_PAGE, sort);
             GeneralMessagePageDto generalMessagePageDto = messageService.findGeneralMessages(pageRequest);
-            System.out.println("main");
-
             String messages = messageWriter.writeValueAsString(generalMessagePageDto.getMessages());
 
-
-
             List<PrivateMessage> privateMessageList = messageService.findPrivateMessages(user);
-            System.out.println("main");
-
             String privateMessages = messageWriter.writeValueAsString(privateMessageList);
 
+            List<GroupMessage> groupMessagesList = messageService.findGroupMessages(user);
+            String groupMessages = messageWriter.writeValueAsString(groupMessagesList);
 
+            List<Group> groupList = groupService.findAllByUser(user.getId());
+            String groups = groupWriter.writeValueAsString(groupList);
+
+            model.addAttribute("groups", groups);
             model.addAttribute("messages", messages);
+            model.addAttribute("groupMessages", groupMessages);
             model.addAttribute("privateMessages", privateMessages);
             data.put("currentPage", generalMessagePageDto.getCurrentPage());
             data.put("totalPages", generalMessagePageDto.getTotalPages());
         } else {
+            model.addAttribute("groups", "[]");
             model.addAttribute("messages", "[]");
+            model.addAttribute("groupMessages", "[]");
             model.addAttribute("privateMessages", "[]");
             model.addAttribute("profile", "null");
         }

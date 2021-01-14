@@ -69,6 +69,15 @@
 
             <v-btn text
                    v-if="profile"
+                   :disabled="$route.path === '/groupMessages'"
+                   @click="showGroupMessages"
+            >
+                <v-icon color="primary" left>message</v-icon>
+                <span>Групповые сообщения</span>
+            </v-btn>
+
+            <v-btn text
+                   v-if="profile"
                    :disabled="$route.path === '/userList'"
                    @click="showUsers"
             >
@@ -96,12 +105,24 @@
 
         computed: mapState(['profile']),
         methods: {
-            ...mapMutations(['addMessageMutation', 'updateMessageMutation', 'removeMessageMutation', 'addPrivateMessageMutation', 'updatePrivateMessageMutation']),
+            ...mapMutations(['addMessageMutation',
+                'updateMessageMutation',
+                'removeMessageMutation',
+                'addPrivateMessageMutation',
+                'updatePrivateMessageMutation',
+                'addGroupMessageMutation',
+                'updateGroupMessageMutation',
+                'addGroupMutation',
+                'updateGroupMutation']),
+
             showGeneralMessages(){
                 this.$router.push('/')
             },
             showPrivateMessages(){
                 this.$router.push('/privateMessages')
+            },
+            showGroupMessages(){
+                this.$router.push(('/groupMessages'))
             },
             showProfile(){
                 this.$router.push('/profile')
@@ -149,10 +170,30 @@
                             console.error('Looks like event type is unknown "${data.eventType}" ')
                     }
                 } else if (data.objectType === 'GROUP_MESSAGE'){
+                    switch (data.eventType) {
 
-                }
+                        case 'CREATE' :
+                            this.addGeneralMessageMutation(data.body);
+                            break;
+                        case 'UPDATE' :
+                            this.updateGeneralMessageMutation(data.body);
+                            break;
+                        default:
+                            console.error('Looks like event type is unknown "${data.eventType}" ')
+                    }
+                } else if (data.objectType === 'GROUP'){
+                    switch (data.eventType) {
 
-                else if (data.objectType === 'LOCKED'){
+                        case 'CREATE' :
+                            this.addGroupMutation(data.body);
+                            break;
+                        case 'UPDATE' :
+                            this.updateGroupMutation(data.body);
+                            break;
+                        default:
+                            console.error('Looks like event type is unknown "${data.eventType}" ')
+                    }
+                } else if (data.objectType === 'LOCKED'){
                     window.location.reload()
                 } else {
                     console.error('Looks like the object type is unknown "${data.bodyType}" ')

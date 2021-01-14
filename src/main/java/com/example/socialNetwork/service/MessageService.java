@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
@@ -123,6 +124,7 @@ public class MessageService {
             GroupMessage groupMessage = (GroupMessage) message;
             GroupMessage updatedMessage = messageRepo.save(groupMessage);
             wsGroupSender.accept(EventType.CREATE, updatedMessage);
+
             return updatedMessage;
         }
 
@@ -161,14 +163,16 @@ public class MessageService {
     }
 
 
-    public GroupMessagePageDto findGroupMessages(List<User> addressees, User author, Pageable pageable) {
-//        Page<GroupMessage> page = groupMessageRepo.findAllByAddresseesOrAuthor(addressees, author, pageable);
-//        return new GroupMessagePageDto(
-//                page.getContent(),
-//                pageable.getPageNumber(),
-//                page.getTotalPages()
-//        );
+    public List<GroupMessage> findGroupMessages(User user){
+        List<GroupMessage> groupMessages = groupMessageRepo.findAll();
+        List<GroupMessage> result = new ArrayList<>();
 
-        return null;
+        for (GroupMessage groupMessage : groupMessages) {
+            if (groupMessage.getGroup().getMembers().contains(user.getId())){
+                result.add(groupMessage);
+            }
+        }
+
+        return result;
     }
 }

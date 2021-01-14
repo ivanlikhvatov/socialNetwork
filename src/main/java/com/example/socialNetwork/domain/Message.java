@@ -1,13 +1,11 @@
 package com.example.socialNetwork.domain;
 
-import com.example.socialNetwork.dto.AuthorityType;
 import com.example.socialNetwork.dto.MessageType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 

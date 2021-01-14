@@ -8,7 +8,7 @@ export default {
     addGroup: message => messages.save({id: "GROUP"}, message),
     update: message => messages.update({id: message.id}, message),
     remove: id => messages.remove({id}),
-    generalMessagePage: page => Vue.http.get('/message/general', {params: { page }}),
-    privateMessagePage: privateMessagePage => Vue.http.get('/message/private'),
-    groupMessagePage: page => Vue.http.get('/message/group', {params: { page }})
+    generalMessagePage: page => Vue.http.get('/message/generalMessage', {params: { page }}),
+    // privateMessagePage: privateMessagePage => Vue.http.get('/message/privateMessage'),
+    // groupMessagePage: page => Vue.http.get('/message/groupMessage', {params: { page }})
 }

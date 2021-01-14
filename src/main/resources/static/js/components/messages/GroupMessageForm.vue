@@ -1,7 +1,7 @@
 <template>
     <v-layout align-center>
         <v-text-field
-                label="Write Something"
+                label="Введите сообщение"
                 v-model="text"
                 @keyup.enter="send"
         />
@@ -35,7 +35,7 @@
                 const message = {
                     id: this.id,
                     text : this.text,
-                    addressee: null
+                    group: null
                 };
 
                 this.sendMessage(message)

@@ -46,12 +46,6 @@ public class UserService implements UserDetailsService{
     }
 
     public boolean addUser(CustomUser user){
-        CustomUser userFromDb = customUserRepo.findByEmail(user.getEmail());
-
-        if (userFromDb != null){
-            return false;
-        }
-
         user.setId(UUID.randomUUID().toString());
         user.setActive(false);
         user.setNonLocked(true);
@@ -65,7 +59,11 @@ public class UserService implements UserDetailsService{
             user.setGender("female");
         }
 
-        userRepo.save(user);
+        if (customUserRepo.findByEmail(user.getEmail()) == null){
+            userRepo.save(user);
+        } else {
+            return false;
+        }
 
         if (!StringUtils.isEmpty(user.getEmail())){
             String message = String.format(

@@ -111,7 +111,7 @@
         mixins: [validationMixin],
 
         validations: {
-            name: { required, maxLength: maxLength(10) },
+            name: { required, maxLength: maxLength(20) },
             email: { required, email },
             select: { required },
             password: { required, maxLength: maxLength(20) }
@@ -144,7 +144,7 @@
             nameErrors () {
                 const errors = []
                 if (!this.$v.name.$dirty) return errors
-                !this.$v.name.maxLength && errors.push('Name must be at most 10 characters long')
+                !this.$v.name.maxLength && errors.push('Name must be at most 20 characters long')
                 !this.$v.name.required && errors.push('Name is required.')
                 return errors
             },

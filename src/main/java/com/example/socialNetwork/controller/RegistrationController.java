@@ -19,9 +19,12 @@ import java.util.regex.Pattern;
 public class RegistrationController {
     @Value("${spring.profiles.active}")
     private String profile;
+    private final UserService userService;
 
     @Autowired
-    UserService userService;
+    public RegistrationController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/registration")
     public String registration(Model model){

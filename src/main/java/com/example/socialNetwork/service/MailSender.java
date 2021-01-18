@@ -8,11 +8,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 @Service
 public class MailSender {
-    @Autowired
-    private JavaMailSender mailSender;
-
     @Value("${spring.mail.username}")
     private String username;
+    private final JavaMailSender mailSender;
+
+    @Autowired
+    public MailSender(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void send(String emailTo, String subject, String message){
         SimpleMailMessage mailMessage = new SimpleMailMessage();

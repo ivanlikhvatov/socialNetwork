@@ -7,7 +7,6 @@
                         permanent
                         id="navDrawer"
                 >
-
                     <v-dialog
                             v-model="dialog"
                             scrollable
@@ -167,7 +166,6 @@
             ...mapGetters(['sortedGroupsWithLastMessage', 'getGroupByGroup'])
         },
         name: "GroupMessageList",
-        // props: ['addressee'],
         data() {
             return {
                 message: null,

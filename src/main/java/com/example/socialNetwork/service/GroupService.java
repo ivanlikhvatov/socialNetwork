@@ -1,8 +1,6 @@
 package com.example.socialNetwork.service;
 
 import com.example.socialNetwork.domain.Group;
-import com.example.socialNetwork.domain.GroupMessage;
-import com.example.socialNetwork.domain.Message;
 import com.example.socialNetwork.domain.Views;
 import com.example.socialNetwork.dto.EventType;
 import com.example.socialNetwork.dto.ObjectType;

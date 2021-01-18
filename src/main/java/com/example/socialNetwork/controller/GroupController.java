@@ -17,14 +17,10 @@ import java.util.List;
 @RequestMapping("group")
 public class GroupController {
     private final GroupService groupService;
-    private final MessageService messageService;
-    private final UserService userService;
 
     @Autowired
-    public GroupController(GroupService groupService, MessageService messageService, UserService userService) {
+    public GroupController(GroupService groupService) {
         this.groupService = groupService;
-        this.messageService = messageService;
-        this.userService = userService;
     }
 
     @GetMapping
@@ -44,12 +40,6 @@ public class GroupController {
         groupService.createGroup(group);
         return group;
     }
-
-//    @PutMapping("addMessage")
-//    @JsonView(Views.FullGroup.class)
-//    public Group update(@RequestBody GroupMessage groupMessage) throws IOException {
-//        return groupService.addMessage(groupMessage);
-//    }
 
     @GetMapping("{id}")
     @JsonView(Views.FullGroup.class)

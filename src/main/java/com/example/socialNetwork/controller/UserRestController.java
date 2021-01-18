@@ -13,8 +13,12 @@ import java.util.List;
 @RestController
 @RequestMapping("user")
 public class UserRestController {
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public UserRestController(UserService userService) {
+        this.userService = userService;
+    }
 
     @JsonView(Views.FullProfile.class)
     @GetMapping
@@ -34,31 +38,4 @@ public class UserRestController {
     public User userEditForm(@PathVariable User user){
         return user;
     }
-
-//    @GetMapping("/profile")
-//    public String getProfile(Model model, @AuthenticationPrincipal User user){
-//        model.addAttribute("basketRepo", basketRepo);
-//        model.addAttribute("username", user.getUsername());
-//        model.addAttribute("email", user.getEmail());
-//
-//        return "profile";
-//    }
-//
-//    @PostMapping("/profile")
-//    public String updateProfile(
-//            @RequestParam String username,
-//            @AuthenticationPrincipal User user,
-//            @RequestParam String password,
-//            @RequestParam String email,
-//            Model model
-//    ){
-//        if (!userService.updateProfile(user, password, email, username)){
-//            model.addAttribute("message", "Не удалось изменить email, пользователь с таким email уже существует");
-//            return "profile";
-//        }
-//
-//        return "redirect:/user/profile";
-//    }
-
-
 }

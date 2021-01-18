@@ -1,6 +1,5 @@
 package com.example.socialNetwork.util;
 
-
 import com.example.socialNetwork.domain.GeneralMessage;
 import com.example.socialNetwork.domain.Group;
 import com.example.socialNetwork.domain.GroupMessage;
